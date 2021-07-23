@@ -2,14 +2,14 @@
 -- GLOBAL VARS
 
 -- Id if the wired modem to access network
-PERIPHERAL_ID = 1
+PERIPHERAL_ID = 2
 
 -- Stores all data withing the network
 --    ITEM NAME   COUNT   ofLOCATIONS IN NETWORK
 -- { Iron_ingot | {125, { CHEST1|32, CHEST2|19 }      } }
 ALL_ITEMS_DATA = {}
 
-OUTPUT_CHEST_NAME = "minecraft:chest_7"
+OUTPUT_CHEST_NAME = "minecraft:chest_3"
 
 
 ----------------------------------------------------------------
@@ -139,18 +139,18 @@ function moveitem(itemname, count, destinationInv)
 
             -- Inventory to pull from
             local inventory = peripheral.wrap(invname)
-            local targetitemdata = inventory.getItemMeta(tonumber(invslot))
+            local targetitemdata = inventory.getItemDetail(tonumber(invslot))
 
             -- Calculate movement
             -- If enough in inventory, take remaining
             if(remaining <= targetitemdata["count"]) then
-                inventory.pushItems(OUTPUT_CHEST_NAME, tonumber(invslot), remaining)
+                inventory.pushItems(destinationInv, tonumber(invslot), remaining)
                 remaining = 0
                 requestcomplete = true
                 break
             -- Otherwise, Take as much as possible and move on
             else
-                inventory.pushItems(OUTPUT_CHEST_NAME, tonumber(invslot), targetitemdata["count"])
+                inventory.pushItems(destinationInv, tonumber(invslot), targetitemdata["count"])
                 remaining = remaining - targetitemdata["count"]
             end
 
@@ -173,4 +173,4 @@ updateNetworkData(modem)
 --     print(chestname)
 -- end
 
-moveitem("minecraft:planks", 22, "left")
+moveitem("minecraft:dirt", 32, OUTPUT_CHEST_NAME)
