@@ -122,7 +122,7 @@ function updateNetworkData(modem)
         for slot, item in pairs(chestInventory) do
 
             -- Does ALL_ITEMS_DATA contain item?
-            local found, index, metadata = findItem(ALL_ITEMS_DATA, item.name)
+            local found, index, metadata = findItem(ALL_ITEMS_DATA, splitString(item.name,":")[2])
             
             -- If the all item data already contains an item
             if (found) then
@@ -133,7 +133,7 @@ function updateNetworkData(modem)
             -- Otherwise, add a new item entry
             else
                 -- create new entry and append to end of table
-                local newitem = {item.name, {item.count, {chestname .. "|".. slot} }}
+                local newitem = {splitString(item.name,":")[2], {item.count, {chestname .. "|".. slot} }}
                 -- #ALL_ITEMS_DATA = Size of table
                 ALL_ITEMS_DATA[#ALL_ITEMS_DATA+1] = newitem
             end
@@ -314,7 +314,7 @@ MODEM = peripheral.wrap(peripheralData[PERIPHERAL_ID])
 updateNetworkData(MODEM)
 
 -- Render main menu
--- mainScreen()
+mainScreen()
 
 -- success, index, meta = findItem(ALL_ITEMS_DATA ,"minecraft:cobblestone")
 -- print("FOUND? " .. tostring(success))
