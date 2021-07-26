@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v0.4"
+OS_VERSION = "v0.5"
 
 -- Global modem variable
 MODEM = nil
@@ -271,6 +271,7 @@ function searchScreen(text)
             print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
         end
 
+    -- No items found in the data store 
     else
         print ("No items found with a name containing '".. text .."'.")
     end
