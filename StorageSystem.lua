@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v0.5"
+OS_VERSION = "v0.6"
 
 -- Global modem variable
 MODEM = nil
@@ -192,6 +192,7 @@ end
 ----------------------------------------------------------------
 -- CONDITIONS
 
+-- Is the parameters of the command correct for a search conditions
 function isSearch(text)
 
     if string.sub(text, 0, 2) == '? ' then
@@ -199,6 +200,19 @@ function isSearch(text)
 
     elseif text:sub(0, 7) == "search " then
         return true, string.sub(text, 8, string.len(text))
+    end
+
+    return false, nil
+end
+
+-- Is the parameters of the command correct for a get conditions
+function isGet(text)
+
+    if string.sub(text, 0, 2) == '/ ' then
+        return true, string.sub(text, 3, string.len(text))
+
+    elseif text:sub(0, 4) == "get " then
+        return true, string.sub(text, 5, string.len(text))
     end
 
     return false, nil
@@ -229,7 +243,7 @@ function startUpScreen()
     print("#####((((((((((((((((((((((((")
     print("#############################")
     print("")
-    print("type ? for help")
+    print("type ! or help for command help.")
 end
 
 -- Write the help screen
@@ -287,13 +301,17 @@ function mainScreen()
 
     -- Get user inputs
     local input = string.lower(read())
-    local searchBool, clipped = isSearch(input)
+    local searchBool, searchClipped = isSearch(input)
+    local getBool, getClipped = isGet(input)
 
     -- Help
     if input == "!" or input == "help" then helpScreen()
 
     -- Search
-    elseif searchBool == true then searchScreen(clipped)
+    elseif searchBool == true then searchScreen(searchClipped)
+
+    -- Get
+    elseif getBool == true then searchScreen(getClipped)
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
