@@ -2,15 +2,21 @@
 -- GLOBAL VARS
 
 -- Id if the wired modem to access network
-PERIPHERAL_ID = 2
+PERIPHERAL_ID = 1
 
 -- Stores all data withing the network
 --    ITEM NAME   COUNT   ofLOCATIONS IN NETWORK
 -- { Iron_ingot | {125, { CHEST1|32, CHEST2|19 }      } }
 ALL_ITEMS_DATA = {}
 
-OUTPUT_CHEST_NAME = "minecraft:chest_3"
+-- Where to output items from the storage system
+OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
+-- The operating system version
+OS_VERSION = "v0.4"
+
+-- Global modem variable
+MODEM = nil
 
 ----------------------------------------------------------------
 -- FUNCTIONS
@@ -69,6 +75,31 @@ function findItem(data, val)
     end
     -- Return false and nil
     return false, nil, nil
+end
+
+-- Search item name in ALL_ITEMS_DATA, Returns bool and {itemname, itemcount}
+function searchItems(data, val)
+
+    local found = {}
+    local foundOne = false
+
+    -- For each in ALL_ITEMS_DATA
+    for index, itemdata in pairs(data) do
+        -- Get meta data out of ALL_ITEMS_DATA entry
+        itemname = itemdata[1]
+        metadata = itemdata[2]
+        itemcount = metadata[1]
+
+        -- If itemname matches searched value
+        if string.find(itemname, val) then
+            -- Return true and the item index, and the item metadata
+            table.insert(found, {itemname, itemcount})
+            foundOne = true
+        end
+
+    end
+    -- Return false and nil
+    return foundOne, found
 end
 
 -- Using a modem, update the ALL_ITEM_DATA with the connected chests
@@ -159,18 +190,132 @@ function moveitem(itemname, count, destinationInv)
 end
 
 ----------------------------------------------------------------
+-- CONDITIONS
+
+function isSearch(text)
+
+    if string.sub(text, 0, 2) == '? ' then
+        return true, string.sub(text, 3, string.len(text))
+
+    elseif text:sub(0, 7) == "search " then
+        return true, string.sub(text, 8, string.len(text))
+    end
+
+    return false, nil
+end
+
+
+----------------------------------------------------------------
+-- SCREENS
+
+-- Writes boot screen, version and logo
+function startUpScreen() 
+    term.clear()
+    term.setCursorPos(1,1)
+    print("----------------------------- POG OS (Client) " .. OS_VERSION)
+    print("")
+    print("")
+    print("     ((((((((((         ((((((((((")
+    print("     ((((((((((         ((((((((((")
+    print("((((((((((((((((((((((((((((((((((")
+    print("((((((((((((((((((((((((((((((((((")
+    print("((((((((((     @@@@@((((     @@@@@")
+    print("((((((((((     @@@@@((((     @@@@@")
+    print("((((((((((((((((((((((((((((((((((")
+    print("((((((((((((((((((((((((((((((((((")
+    print("#####(((((########################")
+    print("#####(((((########################")
+    print("#####((((((((((((((((((((((((")
+    print("#####((((((((((((((((((((((((")
+    print("#############################")
+    print("")
+    print("type ? for help")
+end
+
+-- Write the help screen
+function helpScreen()
+    print("")
+    print("All commands have a single command alias to speed up system usage.")
+    print("")
+    print(" ! | help")
+    print("     Brings up this help menu.")
+    print(" ? | search 'TEXT'")
+    print("     Searches for an item, returns quantity.")
+    print(" / | get 'TEXT' 'QUANTITY'")
+    print("     Moves QUANTITY of item to IO chest.")
+    print(" > | store")
+    print("     Moves contents of IO chest into storage.")
+    print(" ^ | exit")
+    print("     Close POG OS. Return to base computer OS.")
+    print("")
+
+    mainScreen()
+end
+
+-- Search screen
+function searchScreen(text)
+
+    -- Update network data
+    updateNetworkData(MODEM)
+
+    -- Search for items
+    local foundAny, itemdata = searchItems(ALL_ITEMS_DATA ,text)
+
+    -- If item was found, write it out
+    if foundAny then
+        print("")
+        print("Found " .. #itemdata .. " item(s):")
+
+        for index, itemmeta in pairs(itemdata) do 
+            
+            print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
+        end
+
+    else
+        print ("No items found with a name containing '".. text .."'.")
+    end
+
+    mainScreen()
+end
+
+-- Handle normal user input
+function mainScreen()
+
+    -- Write terminal characters
+    term.write("> ")
+
+    -- Get user inputs
+    local input = string.lower(read())
+    local searchBool, clipped = isSearch(input)
+
+    -- Help
+    if input == "!" or input == "help" then helpScreen()
+
+    -- Search
+    elseif searchBool == true then searchScreen(clipped)
+
+    -- Exit
+    elseif input == "^" or input == "exit" then print("Shutting down :(") return
+
+    -- Else, Try help?
+    else print("Unknown command, try 'help' or '!'") mainScreen() end
+end
+
+----------------------------------------------------------------
 -- MAIN
 
--- Get modem
+-- Render boot screen
+startUpScreen()
+
+-- Get modem and build initial data
 peripheralData = peripheral.getNames()
-modem = peripheral.wrap(peripheralData[PERIPHERAL_ID])
+MODEM = peripheral.wrap(peripheralData[PERIPHERAL_ID])
 
-updateNetworkData(modem)
+updateNetworkData(MODEM)
 
--- print(ALL_ITEMS_DATA[1][1] .. "|" .. ALL_ITEMS_DATA[1][2][1])
+-- Render main menu
+-- mainScreen()
 
--- for index, chestname in pairs(ALL_ITEMS_DATA[1][2][2]) do 
---     print(chestname)
--- end
-
-moveitem("minecraft:dirt", 32, OUTPUT_CHEST_NAME)
+-- success, index, meta = findItem(ALL_ITEMS_DATA ,"minecraft:cobblestone")
+-- print("FOUND? " .. tostring(success))
+-- moveitem("minecraft:cobblestone", 4, OUTPUT_CHEST_NAME)
