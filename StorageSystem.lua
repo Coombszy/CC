@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v0.6"
+OS_VERSION = "v0.9"
 
 -- Global modem variable
 MODEM = nil
@@ -115,31 +115,34 @@ function updateNetworkData(modem)
     local names = modem.getNamesRemote()
     for id, chestname in pairs(names) do
 
-        -- Get Chest Inventory
-        local chestInventory = modem.callRemote(chestname, "list")
-        
-        -- For each item in chest
-        for slot, item in pairs(chestInventory) do
+        -- If not the output chest
+        if OUTPUT_CHEST_NAME ~= chestname then
 
-            -- Does ALL_ITEMS_DATA contain item?
-            local found, index, metadata = findItem(ALL_ITEMS_DATA, splitString(item.name,":")[2])
+            -- Get Chest Inventory
+            local chestInventory = modem.callRemote(chestname, "list")
+
             
-            -- If the all item data already contains an item
-            if (found) then
-                -- Add found item count to existing entry
-                metadata[1] = metadata[1] + item.count
-                -- Add chest/peripheral to existing metadata
-                metadata[2][#metadata[2]+1] = chestname .. "|".. slot
-            -- Otherwise, add a new item entry
-            else
-                -- create new entry and append to end of table
-                local newitem = {splitString(item.name,":")[2], {item.count, {chestname .. "|".. slot} }}
-                -- #ALL_ITEMS_DATA = Size of table
-                ALL_ITEMS_DATA[#ALL_ITEMS_DATA+1] = newitem
-            end
+            -- For each item in chest
+            for slot, item in pairs(chestInventory) do
 
+                -- Does ALL_ITEMS_DATA contain item?
+                local found, index, metadata = findItem(ALL_ITEMS_DATA, splitString(item.name,":")[2])
+                
+                -- If the all item data already contains an item
+                if (found) then
+                    -- Add found item count to existing entry
+                    metadata[1] = metadata[1] + item.count
+                    -- Add chest/peripheral to existing metadata
+                    metadata[2][#metadata[2]+1] = chestname .. "|".. slot
+                -- Otherwise, add a new item entry
+                else
+                    -- create new entry and append to end of table
+                    local newitem = {splitString(item.name,":")[2], {item.count, {chestname .. "|".. slot} }}
+                    -- #ALL_ITEMS_DATA = Size of table
+                    ALL_ITEMS_DATA[#ALL_ITEMS_DATA+1] = newitem
+                end
+            end
         end
-    
     end
 end
 
@@ -209,13 +212,13 @@ end
 function isGet(text)
 
     if string.sub(text, 0, 2) == '/ ' then
-        return true, string.sub(text, 3, string.len(text))
+        return true, splitString(string.sub(text, 3, string.len(text)), " ")[1], splitString(string.sub(text, 3, string.len(text)), " ")[2]
 
     elseif text:sub(0, 4) == "get " then
-        return true, string.sub(text, 5, string.len(text))
+        return true, splitString(string.sub(text, 5, string.len(text)), " ")[1], splitString(string.sub(text, 5, string.len(text)), " ")[2]
     end
 
-    return false, nil
+    return false, nil, nil
 end
 
 
@@ -269,11 +272,11 @@ end
 -- Search screen
 function searchScreen(text)
 
-    -- Update network data
+    -- Update network data for search
     updateNetworkData(MODEM)
 
     -- Search for items
-    local foundAny, itemdata = searchItems(ALL_ITEMS_DATA ,text)
+    local foundAny, itemdata = searchItems(ALL_ITEMS_DATA, text)
 
     -- If item was found, write it out
     if foundAny then
@@ -293,6 +296,63 @@ function searchScreen(text)
     mainScreen()
 end
 
+-- Get items screen
+function getScreen(item, count) 
+
+    -- Update network data
+    updateNetworkData(MODEM)
+
+    -- If count is nil
+    if count == nil then
+        print("You did not specify how many to withdraw. E.g:")
+        print("> get cobble 64")
+        print("")
+        mainScreen()
+    end
+
+    -- Search for item
+    local foundAny, itemdata = searchItems(ALL_ITEMS_DATA, item)
+
+    -- If item was found, write it out
+    if not(foundAny) then
+        print ("No items found with a name containing '".. item .."'.")
+        mainScreen()
+    end
+    
+
+    -- If more than one item with the same name was found
+    if #itemdata > 1 then
+        print("Multiple items containing '" .. item .. "' were found!")
+        print("Found " .. #itemdata .. " item(s):")
+
+        for index, itemmeta in pairs(itemdata) do 
+            print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
+        end
+
+        print("")
+        print("Please be more specific")
+        mainScreen()
+    end
+
+    -- Get found items meta data
+    local itemmeta = itemdata[1]
+
+    -- If more than one item with the same name was found
+    if tonumber(itemmeta[2]) < tonumber(count) then
+
+        print("You are trying to withdraw more items than the system contains.")
+        print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
+        mainScreen()
+    end
+
+    -- Withdraw items!
+    moveitem(itemmeta[1], tonumber(count), OUTPUT_CHEST_NAME)
+    print("Withdrawn successfully!")
+
+    mainScreen()
+    
+end
+
 -- Handle normal user input
 function mainScreen()
 
@@ -302,7 +362,7 @@ function mainScreen()
     -- Get user inputs
     local input = string.lower(read())
     local searchBool, searchClipped = isSearch(input)
-    local getBool, getClipped = isGet(input)
+    local getBool, getClipped, getCount = isGet(input)
 
     -- Help
     if input == "!" or input == "help" then helpScreen()
@@ -311,7 +371,7 @@ function mainScreen()
     elseif searchBool == true then searchScreen(searchClipped)
 
     -- Get
-    elseif getBool == true then searchScreen(getClipped)
+    elseif getBool == true then getScreen(getClipped, getCount)
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
