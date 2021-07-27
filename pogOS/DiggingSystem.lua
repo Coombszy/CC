@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.1"
+OS_VERSION = "v0.2"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold" }
@@ -190,13 +190,13 @@ function startUpScreen()
     term.setCursorPos(1,1)
     print("-------------- POG OS (Digging) " .. OS_VERSION)
     print("")
-    print("  (((((((        ((((((")
-    print("(((((((((((((((((((((((")
-    print("((((     @@@((((     @@")
-    print("(((((((((((((((((((((((")
-    print("##((###################")
-    print("##((###################")
-    print("##(((((((((((((((((((")
+    print("  (((((((       (((((")
+    print("((((((((((((((((((((((")
+    print("((((     @@((((     @@")
+    print("((((((((((((((((((((((")
+    print("##((##################")
+    print("##((##################")
+    print("##((((((((((((((((((")
     print("")
     print("type ! or help for command help.")
 end
