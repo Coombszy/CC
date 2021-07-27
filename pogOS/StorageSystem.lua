@@ -229,7 +229,7 @@ end
 function startUpScreen() 
     term.clear()
     term.setCursorPos(1,1)
-    print("----------------------------- POG OS (Client) " .. OS_VERSION)
+    print("---------------------------- POG OS (Storage) " .. OS_VERSION)
     print("")
     print("")
     print("     ((((((((((         ((((((((((")
