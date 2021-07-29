@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v0.9"
+OS_VERSION = "v0.91"
 
 -- Global modem variable
 MODEM = nil
@@ -28,6 +28,16 @@ function splitString(s, delimiter)
         table.insert(result, match)
     end
     return result
+end
+
+-- Does array contain item?
+function hasValue(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
 end
 
 -- Prints the contents of an Ipairs table
@@ -53,7 +63,7 @@ end
 
 -- Prints the contents of a chest
 function printChestContents(data) 
-    for slot, item in pairs(chestContents) do
+    for slot, item in pairs(data) do
         print(("%dx%s in slot %d"):format(item.count, item.name, slot))
     end
 end
@@ -121,7 +131,6 @@ function updateNetworkData(modem)
             -- Get Chest Inventory
             local chestInventory = modem.callRemote(chestname, "list")
 
-            
             -- For each item in chest
             for slot, item in pairs(chestInventory) do
 
@@ -192,6 +201,140 @@ function moveitem(itemname, count, destinationInv)
     end    
 end
 
+-- Using ALL_ITEMS_DATA, store item(s) to storage cluster
+-- ALL_ITEMS_DATA should be updated after item movement
+function storeitems()
+
+    -- Items that were not able to be stored
+    local failedItems = {}
+
+    -- Update network data before pushing items in
+    updateNetworkData(MODEM)
+
+    -- Get Chest Inventory
+    local chestInventory = MODEM.callRemote(OUTPUT_CHEST_NAME, "list")
+
+    -- For each item in chest
+    for slot, item in pairs(chestInventory) do
+
+        -- Set default conditions
+        local complete = false
+        local remaining = item.count
+
+        -- Does ALL_ITEMS_DATA contain item?
+        local itemname = splitString(item.name,":")[2]
+        local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
+
+        -- If item was found try store
+        if found then
+
+            -- if completed moving item
+            complete, remaining = addToExisting(slot, itemname, metadata, remaining)
+            
+        end
+
+        -- If still not found after adding to empty slot
+        if not(complete) then
+
+            -- Add to next empty space
+            complete, remaining = addAtEmpty(slot, itemname, metadata, remaining, remaining)
+
+        end
+
+        -- Item was not able to be stored
+        if not(complete) then
+
+            -- Add itme to failed items list 
+            failedItems[itemname] = remaining
+
+        -- Report item storage success
+        else 
+            print("Stored '" .. itemname .."' x " .. tostring(item.count))
+        end
+    end
+
+    print("")
+end
+
+-- Add to empty space
+function addAtEmpty(inputslot, itemname, metadata, itemamount)
+
+    -- Set states
+    local complete = false
+    local remaining = itemamount
+
+    -- Inventory to pull from
+    local outputchest = peripheral.wrap(OUTPUT_CHEST_NAME)
+
+    print("------ addAtEmpty")
+    print("inputslot: " .. inputslot)
+    print("itemname: " .. itemname)
+    print("itemamount: " .. itemamount)
+
+
+    -- For each chest
+    local names = MODEM.getNamesRemote()
+    for id, chestname in pairs(names) do
+
+        -- If not the output chest
+        if OUTPUT_CHEST_NAME ~= chestname then
+
+            -- Get Chest Inventory and size
+            local chestInventory = MODEM.callRemote(chestname, "list")
+            local chestSize = MODEM.callRemote(chestname, "size")
+
+            -- Stores each slot that is already got an item in
+            local takenSlots = {}
+            
+            -- For each item in chest
+            for slot, item in pairs(chestInventory) do
+                table.insert(takenSlots, slot)
+            end
+
+            -- For each chest slot
+            for i = 1, chestSize do
+
+                -- If slot is empty
+                if not(hasValue(takenSlots, i)) then
+
+                    -- While no failures
+                    local failed = false
+
+                    -- Move item into empty slot
+                    outputchest.pushItems(chestname, inputslot, remaining, tonumber(i))
+
+                    -- Set new values and break
+                    remaining = 0
+                    complete = true
+                    break
+                end
+            end
+        end
+
+        -- If complete, break from for loop
+        if complete then
+            break
+        end
+    end
+
+    return complete, remaining
+end
+
+-- Add to existing space
+function addToExisting(inputslot, itemname, metadata, itemamount)
+
+    -- Set states
+    local complete = false
+    local remaining = itemamount
+
+    print("------ addToExisting")
+    print("inputslot: " .. inputslot)
+    print("itemname: " .. itemname)
+    print("itemamount: " .. itemamount)
+
+    return complete, remaining
+end
+
 ----------------------------------------------------------------
 -- CONDITIONS
 
@@ -260,7 +403,7 @@ function helpScreen()
     print("     Searches for an item, returns quantity.")
     print(" / | get 'TEXT' 'QUANTITY'")
     print("     Moves QUANTITY of item to IO chest.")
-    print(" > | store")
+    print(" < | store")
     print("     Moves contents of IO chest into storage.")
     print(" ^ | exit")
     print("     Close POG OS. Return to base computer OS.")
@@ -373,6 +516,9 @@ function mainScreen()
     -- Get
     elseif getBool == true then getScreen(getClipped, getCount)
 
+    -- Store
+    elseif input == "<" or input == "store" then print("AAAAA") mainScreen()
+
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
 
@@ -384,11 +530,16 @@ end
 -- MAIN
 
 -- Render boot screen
-startUpScreen()
+-- startUpScreen() ------------------------------------------------------------------------------------------- UNCOMMENT ME
 
 -- Get modem and build initial data
 peripheralData = peripheral.getNames()
 MODEM = peripheral.wrap(peripheralData[PERIPHERAL_ID])
+
+-- DEBUG------------------------------------------------------------------------------------------------ REMOVE ME
+storeitems()
+print("HALT")
+read()
 
 updateNetworkData(MODEM)
 
