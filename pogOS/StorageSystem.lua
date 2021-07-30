@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v0.91"
+OS_VERSION = "v0.92"
 
 -- Global modem variable
 MODEM = nil
@@ -207,6 +207,8 @@ function storeitems()
 
     -- Items that were not able to be stored
     local failedItems = {}
+    -- Items that were successfully stored
+    local successfulItems = {}
 
     -- Update network data before pushing items in
     updateNetworkData(MODEM)
@@ -249,11 +251,20 @@ function storeitems()
 
         -- Report item storage success
         else 
-            print("Stored '" .. itemname .."' x " .. tostring(item.count))
+            -- Set 0 to allow adding
+            if successfulItems[itemname] = nil then
+                successfulItems[itemname] = 0
+            end
+            -- Add total of same item stored
+            successfulItems[itemname] = item.count + successfulItems[itemname]
         end
+
+        -- Update network data again for next item in loop
+        updateNetworkData(MODEM)
+
     end
 
-    print("")
+    return successfulItems, failedItems
 end
 
 -- Add to empty space
@@ -265,12 +276,6 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
 
     -- Inventory to pull from
     local outputchest = peripheral.wrap(OUTPUT_CHEST_NAME)
-
-    print("------ addAtEmpty")
-    print("inputslot: " .. inputslot)
-    print("itemname: " .. itemname)
-    print("itemamount: " .. itemamount)
-
 
     -- For each chest
     local names = MODEM.getNamesRemote()
@@ -327,10 +332,47 @@ function addToExisting(inputslot, itemname, metadata, itemamount)
     local complete = false
     local remaining = itemamount
 
-    print("------ addToExisting")
-    print("inputslot: " .. inputslot)
-    print("itemname: " .. itemname)
-    print("itemamount: " .. itemamount)
+    -- Inventory to pull from
+    local outputchest = peripheral.wrap(OUTPUT_CHEST_NAME)
+
+    -- For each chest in metadata of item
+    for i = 1, #metadata[2] do
+
+        -- Get target data from metadata
+        local targetchest = splitString(metadata[2][i],"|")[1]
+        local targetchestslot = splitString(metadata[2][i],"|")[2]
+
+        -- Get chest and item data
+        local targetchestobject = peripheral.wrap(targetchest)
+        local itemdetails = targetchestobject.getItemDetail(tonumber(targetchestslot))
+        local itemmaxstack = itemdetails.maxCount
+        local itemcount = itemdetails.count
+
+        -- Calculate amount to move
+        local maxmoveableamount = itemmaxstack - itemcount
+
+        -- Get the amount to actually move into chest
+        local moveableamount = 0
+        if maxmoveableamount >= remaining then
+            moveableamount = remaining
+
+        else
+            moveableamount = maxmoveableamount
+        end
+
+        -- Move moveable amount
+        outputchest.pushItems(targetchest, inputslot, moveableamount, tonumber(targetchestslot))
+
+        -- Update remaining
+        remaining = remaining - moveableamount 
+
+        -- If all items have been moved
+        if remaining <= 0 then
+            complete = true
+            break
+        end
+        
+    end
 
     return complete, remaining
 end
@@ -546,6 +588,4 @@ updateNetworkData(MODEM)
 -- Render main menu
 mainScreen()
 
--- success, index, meta = findItem(ALL_ITEMS_DATA ,"minecraft:cobblestone")
--- print("FOUND? " .. tostring(success))
--- moveitem("minecraft:cobblestone", 4, OUTPUT_CHEST_NAME)
+-- print("Stored '" .. itemname .."' x " .. tostring(item.count))
