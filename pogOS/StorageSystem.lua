@@ -1,5 +1,6 @@
 ----------------------------------------------------------------
--- GLOBAL VARS
+-- CONFIGS
+-- TO BE CHANGE PER INSTALLATION
 
 -- Id if the wired modem to access network
 PERIPHERAL_ID = 1
@@ -7,13 +8,8 @@ PERIPHERAL_ID = 1
 -- Where to output items from the storage system
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
--- The operating system version
-OS_VERSION = "v1.3"
-
--- Easter egg messages
-EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!"} 
 ----------------------------------------------------------------
--- CODE MANAGED GLOBAL VARS
+-- GLOBAL VARS
 
 -- Stores all data withing the network
 --    ITEM NAME   COUNT   ofLOCATIONS IN NETWORK
@@ -22,6 +18,12 @@ ALL_ITEMS_DATA = {}
 
 -- Global modem variable
 MODEM = nil
+
+-- The operating system version
+OS_VERSION = "v1.4"
+
+-- Easter egg messages
+EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!"} 
 
 ----------------------------------------------------------------
 -- FUNCTIONS
@@ -114,9 +116,15 @@ function searchItems(data, val)
 
         -- If itemname matches searched value
         if string.find(itemname, val) then
+
             -- Return true and the item index, and the item metadata
             table.insert(found, {itemname, itemcount})
             foundOne = true
+
+            -- If name exact matches, return the one
+            if itemname == val then
+                break
+            end
         end
 
     end
