@@ -123,6 +123,11 @@ function searchItems(data, val)
 
             -- If name exact matches, return the one
             if itemname == val then
+
+                -- Reset to get the exact item matched item
+                found = {}
+                table.insert(found, {itemname, itemcount})
+                foundOne = true
                 break
             end
         end
