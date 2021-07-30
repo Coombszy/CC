@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v0.92"
+OS_VERSION = "v1.0"
 
 -- Global modem variable
 MODEM = nil
@@ -203,7 +203,7 @@ end
 
 -- Using ALL_ITEMS_DATA, store item(s) to storage cluster
 -- ALL_ITEMS_DATA should be updated after item movement
-function storeitems()
+function storeItems()
 
     -- Items that were not able to be stored
     local failedItems = {}
@@ -252,7 +252,7 @@ function storeitems()
         -- Report item storage success
         else 
             -- Set 0 to allow adding
-            if successfulItems[itemname] = nil then
+            if successfulItems[itemname] == nil then
                 successfulItems[itemname] = 0
             end
             -- Add total of same item stored
@@ -538,6 +538,39 @@ function getScreen(item, count)
     
 end
 
+-- store screen
+function storeScreen()
+
+    -- write warning to user
+    print("Storing all items in IO chest...")
+
+    -- Store items from IO test
+    local stored, failed = storeItems()
+
+    print("")
+    print("Stored:")
+
+    -- List item storing results
+    for itemname, itemcount in pairs(stored) do 
+        print(" - '" .. itemname .."' x " .. tostring(itemcount))
+    end
+
+    -- Only list failed if greater than 0
+    if #failed > 0 then 
+        print()
+        print("")
+        print("Failed to store:")
+
+        -- List failed item storing results
+        for itemname, itemcount in pairs(failed) do 
+            print(" - '" .. itemname .."' x " .. tostring(itemcount))
+        end
+    end
+
+    print("")
+    mainScreen()
+end
+
 -- Handle normal user input
 function mainScreen()
 
@@ -559,7 +592,7 @@ function mainScreen()
     elseif getBool == true then getScreen(getClipped, getCount)
 
     -- Store
-    elseif input == "<" or input == "store" then print("AAAAA") mainScreen()
+    elseif input == "<" or input == "store" then storeScreen()
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
@@ -572,20 +605,13 @@ end
 -- MAIN
 
 -- Render boot screen
--- startUpScreen() ------------------------------------------------------------------------------------------- UNCOMMENT ME
+startUpScreen()
 
 -- Get modem and build initial data
 peripheralData = peripheral.getNames()
 MODEM = peripheral.wrap(peripheralData[PERIPHERAL_ID])
 
--- DEBUG------------------------------------------------------------------------------------------------ REMOVE ME
-storeitems()
-print("HALT")
-read()
-
 updateNetworkData(MODEM)
 
 -- Render main menu
 mainScreen()
-
--- print("Stored '" .. itemname .."' x " .. tostring(item.count))
