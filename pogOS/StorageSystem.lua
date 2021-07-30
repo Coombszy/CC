@@ -13,7 +13,7 @@ ALL_ITEMS_DATA = {}
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v1.0"
+OS_VERSION = "v1.1"
 
 -- Global modem variable
 MODEM = nil
@@ -596,6 +596,11 @@ function mainScreen()
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
+
+    -- HIDDEN FEATURES!
+
+    -- Feeling froggy
+    elseif input == "pog" or input == "poggy" then print("Feeling poggy froggy") mainScreen()
 
     -- Else, Try help?
     else print("Unknown command, try 'help' or '!'") mainScreen() end
