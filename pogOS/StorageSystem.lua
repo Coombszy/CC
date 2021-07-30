@@ -20,7 +20,7 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.51"
+OS_VERSION = "v1.52"
 
 -- Easter egg messages
 EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater", "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!", "You must construct additional pylons!", "Oof", "Is this a good use of your time?", "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR", "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration", "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?", "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different", "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks","Apes strong together", "AMC TO THE MOON!"} 
@@ -130,6 +130,33 @@ function searchItems(data, val)
                 foundOne = true
                 break
             end
+        end
+
+    end
+    -- Return false and nil
+    return foundOne, found
+end
+
+-- Search item name in ALL_ITEMS_DATA, Returns bool and {itemname, itemcount}
+function searchItemsNoExactMatch(data, val)
+
+    local found = {}
+    local foundOne = false
+
+    -- For each in ALL_ITEMS_DATA
+    for index, itemdata in pairs(data) do
+        -- Get meta data out of ALL_ITEMS_DATA entry
+        itemname = itemdata[1]
+        metadata = itemdata[2]
+        itemcount = metadata[1]
+
+        -- If itemname matches searched value
+        if string.find(itemname, val) then
+
+            -- Return true and the item index, and the item metadata
+            table.insert(found, {itemname, itemcount})
+            foundOne = true
+
         end
 
     end
@@ -486,7 +513,7 @@ function searchScreen(text)
     updateNetworkData(MODEM)
 
     -- Search for items
-    local foundAny, itemdata = searchItems(ALL_ITEMS_DATA, text)
+    local foundAny, itemdata = searchItemsNoExactMatch(ALL_ITEMS_DATA, text)
 
     -- If item was found, write it out
     if foundAny then
