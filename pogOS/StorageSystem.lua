@@ -4,16 +4,21 @@
 -- Id if the wired modem to access network
 PERIPHERAL_ID = 1
 
--- Stores all data withing the network
---    ITEM NAME   COUNT   ofLOCATIONS IN NETWORK
--- { Iron_ingot | {125, { CHEST1|32, CHEST2|19 }      } }
-ALL_ITEMS_DATA = {}
-
 -- Where to output items from the storage system
 OUTPUT_CHEST_NAME = "minecraft:chest_10"
 
 -- The operating system version
-OS_VERSION = "v1.1"
+OS_VERSION = "v1.3"
+
+-- Easter egg messages
+EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!"} 
+----------------------------------------------------------------
+-- CODE MANAGED GLOBAL VARS
+
+-- Stores all data withing the network
+--    ITEM NAME   COUNT   ofLOCATIONS IN NETWORK
+-- { Iron_ingot | {125, { CHEST1|32, CHEST2|19 }      } }
+ALL_ITEMS_DATA = {}
 
 -- Global modem variable
 MODEM = nil
@@ -66,6 +71,13 @@ function printChestContents(data)
     for slot, item in pairs(data) do
         print(("%dx%s in slot %d"):format(item.count, item.name, slot))
     end
+end
+
+-- Gets item details using chest name and slot
+function getItemDetails(chestname, slot)
+    -- Get chest and item data
+    local targetchestobject = peripheral.wrap(chestname)
+    return targetchestobject.getItemDetail(tonumber(slot))
 end
 
 -- Does ALL_ITEMS_DATA contain item, Returns index and metadata
@@ -487,14 +499,6 @@ function getScreen(item, count)
     -- Update network data
     updateNetworkData(MODEM)
 
-    -- If count is nil
-    if count == nil then
-        print("You did not specify how many to withdraw. E.g:")
-        print("> get cobble 64")
-        print("")
-        mainScreen()
-    end
-
     -- Search for item
     local foundAny, itemdata = searchItems(ALL_ITEMS_DATA, item)
 
@@ -503,7 +507,6 @@ function getScreen(item, count)
         print ("No items found with a name containing '".. item .."'.")
         mainScreen()
     end
-    
 
     -- If more than one item with the same name was found
     if #itemdata > 1 then
@@ -517,6 +520,35 @@ function getScreen(item, count)
         print("")
         print("Please be more specific")
         mainScreen()
+    end
+
+    -- If count is null, grab a stack of the item
+    if count == nil then
+        print("You did not specify how many to withdraw. E.g:")
+        print("> get cobble 64")
+        print("Will withdraw a stack instead! Or the next avaliable amount!")
+        print("")
+
+        -- Get the item metadata from system
+        local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
+
+        -- Get the current amount
+        local storedAmount = tonumber(itemdata[1][2])
+
+        -- Get sample data to find the max stack size of item
+        local samplechest = splitString(metadata[2][1], "|")[1]
+        local sampleslot = splitString(metadata[2][1], "|")[2]
+        
+        -- Get max stack size for item
+        local maxStackSize = getItemDetails(samplechest,sampleslot).maxCount
+
+        -- Get the amount to actually move into chest
+        if maxStackSize >= storedAmount then
+            count = storedAmount
+        else
+            count = maxStackSize
+        end
+
     end
 
     -- Get found items meta data
@@ -571,6 +603,20 @@ function storeScreen()
     mainScreen()
 end
 
+-- easter egg screen
+function easterEggScreen()
+
+    -- Get random number generator and shuffle a few
+    -- math.randomseed(os.time())
+    math.random(); math.random(); math.random()
+
+    -- Print a random message from EA_STRINGS
+    print(EA_STRINGS[math.random(#EA_STRINGS)])
+
+    -- Return to main screen
+    mainScreen()
+end
+
 -- Handle normal user input
 function mainScreen()
 
@@ -600,7 +646,7 @@ function mainScreen()
     -- HIDDEN FEATURES!
 
     -- Feeling froggy
-    elseif input == "pog" or input == "poggy" then print("Feeling poggy froggy") mainScreen()
+    elseif input == "pog" or input == "poggy" then easterEggScreen()
 
     -- Else, Try help?
     else print("Unknown command, try 'help' or '!'") mainScreen() end
