@@ -23,19 +23,12 @@ if AUTO_UPDATE == 1 then
     print("PATCHING POG OS")
     shell.run(PATH .. "patcher.lua")
 
-    term.clear()
-    term.setCursorPos(1,1)
-
     print("PATCHING COMPLETE")
 end
 
 -- BOOT MENU(POG OS)
 -----------------------------------------------------------------------
 print("BOOTING POG OS")
-
-print("HALTING BOOT")
-print("Press enter to continue")
-read()
 
 if BOOT_ITEM == 1 then
     shell.run(PATH .. "storageSystem.lua")

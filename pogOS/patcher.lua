@@ -21,12 +21,6 @@ POGOS_HOME = configManagerShared.fetch()["HOME"]
 -- MAIN
 -----------------------------------------------------------------------
 
-print("----------")
-print("FILE:"..UPDATE_FILES)
-print("DELI:"..FILE_LIST_DELIMITER)
-print("----------")
-
-
 local targetFiles = utils.splitString(UPDATE_FILES, FILE_LIST_DELIMITER)
 
 -- For each file download
