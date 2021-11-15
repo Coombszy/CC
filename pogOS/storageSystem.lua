@@ -6,7 +6,7 @@
 PERIPHERAL_ID = 1
 
 -- Where to output items from the storage system
-OUTPUT_CHEST_NAME = "minecraft:chest_10"
+OUTPUT_CHEST_NAME = "minecraft:chest_0"
 
 ----------------------------------------------------------------
 -- GLOBAL VARS
