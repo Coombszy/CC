@@ -20,10 +20,14 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.52"
+OS_VERSION = "v1.53"
 
 -- Easter egg messages
 EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater", "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!", "You must construct additional pylons!", "Insufficient vespene gas", "Oof", "Is this a good use of your time?", "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR", "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration", "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?", "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different", "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks", "Apes strong together", "AMC TO THE MOON!"} 
+
+-- Temporary States
+STATES = []
+STATES["MISSING_AMOUNT_WARNED"] = false
 
 ----------------------------------------------------------------
 -- FUNCTIONS
@@ -564,10 +568,17 @@ function getScreen(item, count)
 
     -- If count is null, grab a stack of the item
     if count == nil then
-        print("You did not specify how many to withdraw. E.g:")
-        print("> get cobble 64")
-        print("Will withdraw a stack instead! Or the next avaliable amount!")
-        print("")
+
+        if not(STATES["MISSING_AMOUNT_WARNED"]) then
+            print("You did not specify how many to withdraw. E.g:")
+            print("> get cobble 64")
+            print("Will withdraw a stack instead! Or the next avaliable amount!")
+            print("This error will appear after next reboot.")
+            print("")
+            STATES["MISSING_AMOUNT_WARNED"] = true
+        else
+            print("Withdrawn stack/avaliable")
+        end
 
         -- Get the item metadata from system
         local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
