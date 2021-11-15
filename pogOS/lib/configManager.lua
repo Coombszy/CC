@@ -1,3 +1,8 @@
+-- IMPORTS
+----------------------------------------------------------------
+local utils = require("lib/utils")
+----------------------------------------------------------------
+
 local configManager = {}
 
 configManager.new = function()
@@ -17,15 +22,6 @@ configManager.new = function()
 
     -- FUNCTIONS
     ----------------------------------------
-
-    -- Split string by delimiter
-    local function splitString(s, delimiter)
-        local result = {}
-        for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-            table.insert(result, match)
-        end
-        return result
-    end
 
     -- does target file actually exist
     function self.present()
@@ -49,7 +45,7 @@ configManager.new = function()
         -- for each line in config
         for line in io.lines(targetFile) do
 
-            split = splitString(line, configDelimiter)
+            split = utils.splitString(line, configDelimiter)
 
             local key = split[1]
             local value = split[2]
@@ -59,7 +55,12 @@ configManager.new = function()
 
                 value = ""
                 for i = 2, table.getn(split) do
-                    value = value..split[i]
+
+                    if (value == "") then
+                        value = value..split[i]
+                    else
+                        value = value..configDelimiter..split[i]
+                    end
                 end
 
             end

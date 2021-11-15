@@ -1,8 +1,13 @@
+-- IMPORTS
 ----------------------------------------------------------------
--- CONFIGS
--- TO BE CHANGE PER INSTALLATION
+local utils = require("lib/utils")
 
--- Id if the wired modem to access network
+-- CONFIGS
+----------------------------------------------------------------
+-- TO BE CHANGE PER INSTALLATION
+-- TODO(Liam): This should be replaced with the new configmanager
+
+-- Id of the wired modem to access network
 PERIPHERAL_ID = 1
 
 -- Where to output items from the storage system
@@ -26,30 +31,11 @@ OS_VERSION = "v1.53"
 EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater", "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!", "You must construct additional pylons!", "Insufficient vespene gas", "Oof", "Is this a good use of your time?", "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR", "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration", "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?", "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different", "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks", "Apes strong together", "AMC TO THE MOON!"} 
 
 -- Temporary States
-STATES = []
+STATES = {}
 STATES["MISSING_AMOUNT_WARNED"] = false
 
 ----------------------------------------------------------------
 -- FUNCTIONS
-
--- Split string by delimiter
-function splitString(s, delimiter)
-    local result = {}
-    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-        table.insert(result, match)
-    end
-    return result
-end
-
--- Does array contain item?
-function hasValue(tab, val)
-    for index, value in ipairs(tab) do
-        if value == val then
-            return true
-        end
-    end
-    return false
-end
 
 -- Prints the contents of an Ipairs table
 function printIpairs(table)
@@ -191,7 +177,7 @@ function updateNetworkData(modem)
             for slot, item in pairs(chestInventory) do
 
                 -- Does ALL_ITEMS_DATA contain item?
-                local found, index, metadata = findItem(ALL_ITEMS_DATA, splitString(item.name,":")[2])
+                local found, index, metadata = findItem(ALL_ITEMS_DATA, utils.splitString(item.name,":")[2])
                 
                 -- If the all item data already contains an item
                 if (found) then
@@ -202,7 +188,7 @@ function updateNetworkData(modem)
                 -- Otherwise, add a new item entry
                 else
                     -- create new entry and append to end of table
-                    local newitem = {splitString(item.name,":")[2], {item.count, {chestname .. "|".. slot} }}
+                    local newitem = {utils.splitString(item.name,":")[2], {item.count, {chestname .. "|".. slot} }}
                     -- #ALL_ITEMS_DATA = Size of table
                     ALL_ITEMS_DATA[#ALL_ITEMS_DATA+1] = newitem
                 end
@@ -230,7 +216,7 @@ function moveitem(itemname, count, destinationInv)
         -- for each metadata entry
         for index, invdata in pairs(metadata[2]) do 
             -- Split string by delimiter
-            local dataSplit = splitString(invdata, "|")
+            local dataSplit = utils.splitString(invdata, "|")
 
             -- Define vars about item in chest
             local invname = dataSplit[1]
@@ -280,7 +266,7 @@ function storeItems()
         local remaining = item.count
 
         -- Does ALL_ITEMS_DATA contain item?
-        local itemname = splitString(item.name,":")[2]
+        local itemname = utils.splitString(item.name,":")[2]
         local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
 
         -- If item was found try store
@@ -356,7 +342,7 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
             for i = 1, chestSize do
 
                 -- If slot is empty
-                if not(hasValue(takenSlots, i)) then
+                if not(utils.hasValue(takenSlots, i)) then
 
                     -- While no failures
                     local failed = false
@@ -395,8 +381,8 @@ function addToExisting(inputslot, itemname, metadata, itemamount)
     for i = 1, #metadata[2] do
 
         -- Get target data from metadata
-        local targetchest = splitString(metadata[2][i],"|")[1]
-        local targetchestslot = splitString(metadata[2][i],"|")[2]
+        local targetchest = utils.splitString(metadata[2][i],"|")[1]
+        local targetchestslot = utils.splitString(metadata[2][i],"|")[2]
 
         -- Get chest and item data
         local targetchestobject = peripheral.wrap(targetchest)
@@ -453,10 +439,10 @@ end
 function isGet(text)
 
     if string.sub(text, 0, 2) == '/ ' then
-        return true, splitString(string.sub(text, 3, string.len(text)), " ")[1], splitString(string.sub(text, 3, string.len(text)), " ")[2]
+        return true, utils.splitString(string.sub(text, 3, string.len(text)), " ")[1], utils.splitString(string.sub(text, 3, string.len(text)), " ")[2]
 
     elseif text:sub(0, 4) == "get " then
-        return true, splitString(string.sub(text, 5, string.len(text)), " ")[1], splitString(string.sub(text, 5, string.len(text)), " ")[2]
+        return true, utils.splitString(string.sub(text, 5, string.len(text)), " ")[1], utils.splitString(string.sub(text, 5, string.len(text)), " ")[2]
     end
 
     return false, nil, nil
@@ -493,7 +479,7 @@ end
 -- Write the help screen
 function helpScreen()
     print("")
-    print("All commands have a single command alias to speed up system usage.")
+    print("All commands have a single character alias to speed up system usage.")
     print("")
     print(" ! | help")
     print("     Brings up this help menu.")
@@ -587,8 +573,8 @@ function getScreen(item, count)
         local storedAmount = tonumber(itemdata[1][2])
 
         -- Get sample data to find the max stack size of item
-        local samplechest = splitString(metadata[2][1], "|")[1]
-        local sampleslot = splitString(metadata[2][1], "|")[2]
+        local samplechest = utils.splitString(metadata[2][1], "|")[1]
+        local sampleslot = utils.splitString(metadata[2][1], "|")[2]
         
         -- Get max stack size for item
         local maxStackSize = getItemDetails(samplechest,sampleslot).maxCount

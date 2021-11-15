@@ -22,6 +22,11 @@ term.setCursorPos(1,1)
 if AUTO_UPDATE == 1 then
     print("PATCHING POG OS")
     shell.run(PATH .. "patcher.lua")
+
+    term.clear()
+    term.setCursorPos(1,1)
+
+    print("PATCHING COMPLETE")
 end
 
 -- BOOT MENU(POG OS)
