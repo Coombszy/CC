@@ -172,6 +172,7 @@ function digArea()
         turtle.forward()
         DISTANCE_TRAVELLED = DISTANCE_TRAVELLED + 1
         digDown()
+        digUp()
         if((DISTANCE_TRAVELLED % 6) == 0) then
             cleanInv()
         end
