@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.22"
+OS_VERSION = "v0.23"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold" }
@@ -46,7 +46,7 @@ function queryRefuel()
                 queryRefuel()
             end
         else
-            error("INSUFFICIENT FUEL")
+            error("INSUFFICIENT FUEL. REBOOT ME!")
         end
     end
 end
@@ -114,6 +114,7 @@ end
 function digStraight()
 
     -- Write system data and get distance to dig
+    print("RUNNING LEGACY DIGLINE CODE!")
     print("CURRENT FUEL: " .. turtle.getFuelLevel())
     print("DISTANCE TO DIG: ")
     DISTANCE_TO_DIG = tonumber(read())
