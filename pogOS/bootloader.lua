@@ -9,7 +9,7 @@ configManager = require("lib/configManager")
 PATH = "/"..fs.getDir( shell.getRunningProgram() ).."/"
 configManager.setTargetConfig(PATH .. "config/shared.conf")
 
-BOOT_ITEM = 1
+BOOT_ITEM = tonumber(configManager.fetch()["AUTO_BOOT"])
 AUTO_UPDATE = tonumber(configManager.fetch()["AUTO_UPDATE"])
 
 -- WIPE
