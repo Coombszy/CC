@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.21"
+OS_VERSION = "v0.22"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold" }
@@ -130,6 +130,8 @@ function digStraight()
         turtle.forward()
         DISTANCE_TRAVELLED = DISTANCE_TRAVELLED + 1
         digDown()
+        digUp()
+
         if((DISTANCE_TRAVELLED % 6) == 0) then
             cleanInv()
         end
@@ -147,41 +149,6 @@ function digStraight()
 
 end
 
--- Old mining code (straight line)
-function digArea()
-
-    -- WARNING
-    print("PLEASE KEEP NETHERRACK IN SLOT 1") 
-
-    -- Write system data and get distance to dig
-    print("CURRENT FUEL: " .. turtle.getFuelLevel())
-    print("DISTANCE TO DIG (LENGTH): ")
-    DISTANCE_TO_DIG_X = tonumber(read())
-    print("DISTANCE TO DIG (WIDTH): ")
-    DISTANCE_TO_DIG_Y = tonumber(read())
-    print("THIS WILL COST " .. (DISTANCE_TO_DIG_X * DISTANCE_TO_DIG_Y) .. " FUEL" )
-
-    -- Get some fuel
-    queryRefuel()
-
-    -- Dig to players specified distance
-    print("STARTING MINING")
-    DISTANCE_TRAVELLED = 0
-    while(DISTANCE_TRAVELLED < DISTANCE_TO_DIG_X) do
-        digForward()
-        turtle.forward()
-        DISTANCE_TRAVELLED = DISTANCE_TRAVELLED + 1
-        digDown()
-        digUp()
-        if((DISTANCE_TRAVELLED % 6) == 0) then
-            cleanInv()
-        end
-    end
-
-    -- Go back to main screen
-    mainScreen()
-
-end
 -----------------------------------------------------------------
 ------ SCREENS 
 
