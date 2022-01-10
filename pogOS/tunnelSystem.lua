@@ -48,8 +48,11 @@ function bootup()
     MODEM = peripheral.find("modem") or error("Failed to load modem! Add one and reboot!", 0)
 
     -- Load configs
+    PATH = "/"..fs.getDir( shell.getRunningProgram() ).."/"
+    tunnelConfigs.setTargetConfig(PATH .. "config/tunnel.conf")
+
     S_CHANNEL = tonumber(tunnelConfigs.fetch()["SEND_CHANNEL"])
-    R_CHANNEL = tonumber(tunnelConfigs.fetch()["RECIEVE_CHANNEL"])
+    R_CHANNEL = tonumber(tunnelConfigs.fetch()["RECEIVE_CHANNEL"])
     DELIMITER = tunnelConfigs.fetch()["CONTENT_DELIMITER"]
 
 end
