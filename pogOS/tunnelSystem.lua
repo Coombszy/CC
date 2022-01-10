@@ -99,11 +99,11 @@ function ingest(content)
 
         response = "PING_RECEIVED"
 
-        print("R: PING S:" .. response)
+        print("R:PING S:" .. response)
         MODEM.transmit(S_CHANNEL, R_CHANNEL, response)
         return response
     else
-        print("R: " .. command .. " ?")
+        print("R:" .. command .. " ?")
         return "UNKNOWN_COMMAND"
     end
 
