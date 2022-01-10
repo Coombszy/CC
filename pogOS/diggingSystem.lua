@@ -166,7 +166,7 @@ function nextSpot(direction)
         digUp()
         digDown()
         digForward()
-        turtle.forward
+        turtle.forward()
     end
 
     -- turn to original direction
