@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.31"
+OS_VERSION = "v0.32"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
@@ -249,7 +249,7 @@ function mainScreen()
     elseif input == "<" or input == "moveleft" then nextSpot("left")
 
     -- Consume half of fuel
-    elseif input == "/" or input == "refuelhalf" then refuel()
+    elseif input == "/" or input == "refuelhalf" then refuel() mainScreen()
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
