@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.34"
+OS_VERSION = "v0.35"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
@@ -196,6 +196,10 @@ function digLoop()
         digUp()
 
         DISTANCE_TRAVELLED = DISTANCE_TRAVELLED - 1
+
+        if((DISTANCE_TRAVELLED % 6) == 0) then
+            cleanInv()
+        end
     end
 
     -- Rotate to home
