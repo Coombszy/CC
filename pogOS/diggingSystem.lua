@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.32"
+OS_VERSION = "v0.33"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
@@ -34,16 +34,16 @@ function refuel()
 end
 
 -- Asks the user if it should consume fuel
-function queryRefuel()
+function queryRefuel(fuelrequired)
     -- Does it have enough fuel, if not allow consumption
-    if ((DISTANCE_TO_DIG * 2) >= turtle.getFuelLevel()) then
+    if ((fuelrequired) >= turtle.getFuelLevel()) then
         print("INSUFFICIENT FUEL")
         print("CONSUME FUEL (Y/N): ")
         input = read()
         if (input == "Y") then
             refuel()
-            if ((DISTANCE_TO_DIG * 2) >= turtle.getFuelLevel()) then
-                queryRefuel()
+            if ((fuelrequired) >= turtle.getFuelLevel()) then
+                queryRefuel(fuelrequired - turtle.getFuelLevel())
             end
         else
             error("INSUFFICIENT FUEL. REBOOT ME!")
@@ -121,7 +121,7 @@ function digStraight()
     print("THIS WILL COST " .. (DISTANCE_TO_DIG * 2) .. " FUEL" )
 
     -- Get some fuel
-    queryRefuel()
+    queryRefuel(DISTANCE_TO_DIG * 2)
 
     -- Dig to players specified distance
     print("STARTING MINING")
@@ -144,6 +144,63 @@ function digStraight()
         turtle.back()
         DISTANCE_TRAVELLED = DISTANCE_TRAVELLED - 1
     end
+
+    -- Go back to main screen
+    mainScreen()
+
+end
+
+-- Old mining code UPDATED (With return loop)
+function digLoop()
+
+    -- Write system data and get distance to dig
+    print("RUNNING LEGACY DIGLOOP CODE!")
+    print("CURRENT FUEL: " .. turtle.getFuelLevel())
+    print("DISTANCE TO DIG: ")
+    DISTANCE_TO_DIG = tonumber(read())
+    print("THIS WILL COST " .. ((DISTANCE_TO_DIG * 2) + 2) .. " FUEL" )
+
+    -- Get some fuel
+    queryRefuel((DISTANCE_TO_DIG * 2) + 2)
+
+    -- Dig to players specified distance
+    print("STARTING MINING")
+    DISTANCE_TRAVELLED = 0
+    while(DISTANCE_TRAVELLED < DISTANCE_TO_DIG) do
+        digForward()
+        turtle.forward()
+        DISTANCE_TRAVELLED = DISTANCE_TRAVELLED + 1
+        digDown()
+        digUp()
+
+        if((DISTANCE_TRAVELLED % 6) == 0) then
+            cleanInv()
+        end
+    end
+
+    -- Rotate at the end
+    digForward()
+    turtle.forward()
+    digDown()
+    digUp()
+    turtle.turnRight()
+
+    -- Return Home
+    print("RETURNING HOME")
+    while(DISTANCE_TRAVELLED > 0) do
+        
+        digForward()
+        turtle.forward()
+        digDown()
+        digUp()
+
+        DISTANCE_TRAVELLED = DISTANCE_TRAVELLED - 1
+    end
+
+    -- Rotate to home
+    turtle.turnRight()
+    turtle.forward()
+    turtle.turnRight()
 
     -- Go back to main screen
     mainScreen()
@@ -214,6 +271,8 @@ function helpScreen()
     print("   | Brings up this help menu.")
     print(" - | digline")
     print("   | Dig in a straight line.")
+    print(" o | digloop")
+    print("   | Dig in a straight loop.")
     print(" > | moveright")
     print("   | Move right to next digging spot (will break blocks).")
     print(" < | moveleft")
@@ -241,6 +300,9 @@ function mainScreen()
 
     -- Dig straight line
     elseif input == "-" or input == "digline" then digStraight()
+
+    -- Dig straight loop
+    elseif input == "o" or input == "digloop" then digLoop()
 
     -- Move to new spot right
     elseif input == ">" or input == "moveright" then nextSpot("right")
