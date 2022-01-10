@@ -2,11 +2,11 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.23"
+OS_VERSION = "v0.3"
 
 DISTANCE_TO_DIG = 0
-TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold" }
-TO_KEEP_FILLER = { "cobble", "netherrack" }
+TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
+NEXT_SPOT_DELTA = 3
 
 -----------------------------------------------------------------
 ------ FUNCTIONS
@@ -150,6 +150,38 @@ function digStraight()
 
 end
 
+-- Moves over to next mining postion
+function nextSpot(direction)
+
+    turtle.back()
+
+    -- turn to next spot direction
+    if direction == "right" then
+        turtle.turnRight()
+    else -- left
+        turtle.turnLeft()
+    end
+
+    for i=1, NEXT_SPOT_DELTA do
+        digUp()
+        digDown()
+        digForward()
+        turtle.forward
+    end
+
+    -- turn to original direction
+    if direction == "right" then
+        turtle.turnLeft()
+    else -- left
+        turtle.turnRight()
+    end
+
+    -- get into position
+    digForward()
+    turtle.forward()
+
+end
+
 -----------------------------------------------------------------
 ------ SCREENS 
 
@@ -175,9 +207,18 @@ function helpScreen()
     print("")
     print("All commands and descriptions.")
     print("")
-    print(" help    | Brings up this help menu.")
-    print(" digline | Dig in a straight line.")
-    print(" exit    | Exit to base OS.")
+    print(" ! | help")
+    print("   | Brings up this help menu.")
+    print(" - | digline")
+    print("   | Dig in a straight line.")
+    print(" > | moveright")
+    print("   | Move right to next digging spot (will break blocks).")
+    print(" < | moveleft")
+    print("   | Move left to next digging spot (will break blocks).")
+    print(" / | refuelhalf")
+    print("   | Consume half of avaliable fuel.")
+    print(" ^ | exit")
+    print("   | Exit to base OS.")
     print("")
 
     mainScreen()
@@ -196,7 +237,16 @@ function mainScreen()
     if input == "!" or input == "help" then helpScreen()
 
     -- Dig straight line
-    elseif input == "digline" then digStraight()
+    elseif input == "-" or input == "digline" then digStraight()
+
+    -- Move to new spot right
+    elseif input == ">" or input == "moveright" then nextSpot("right")
+
+    -- Move to new spot right
+    elseif input == "<" or input == "moveleft" then nextSpot("left")
+
+    -- Consume half of fuel
+    elseif input == "/" or input == "refuelhalf" then refuel()
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return
