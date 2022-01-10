@@ -61,7 +61,7 @@ end
 function runNode()
 
     -- Start listening on configured channel
-    modem.open(R_CHANNEL)
+    MODEM.open(R_CHANNEL)
 
     -- Define vars
     local event, side, channel, replyChannel, message, distance
