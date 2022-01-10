@@ -90,7 +90,7 @@ function ingest(content)
     command = utils.splitString(content, DELIMITER)[0]
     data = utils.splitString(content, DELIMITER)[1]
 
-    if command == "PING" do
+    if command == "PING" then
         return "PING_RECIEVED"
     else
         return "UNKNOWN_COMMAND"
