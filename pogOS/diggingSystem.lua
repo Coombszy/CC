@@ -2,7 +2,7 @@
 -- GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.33"
+OS_VERSION = "v0.34"
 
 DISTANCE_TO_DIG = 0
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
@@ -179,6 +179,7 @@ function digLoop()
     end
 
     -- Rotate at the end
+    turtle.turnRight()
     digForward()
     turtle.forward()
     digDown()
