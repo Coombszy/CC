@@ -55,6 +55,12 @@ function bootup()
     R_CHANNEL = tonumber(tunnelConfigs.fetch()["RECEIVE_CHANNEL"])
     DELIMITER = tunnelConfigs.fetch()["CONTENT_DELIMITER"]
 
+    print("DEBUG")
+    print(S_CHANNEL)
+    print(R_CHANNEL)
+    print(DELIMITER)
+    input()
+
 end
 
 -- Run os as a node (digger)
