@@ -60,6 +60,8 @@ end
 -- Run os as a node (digger)
 function runNode()
 
+    print("Node started! Waiting for data...")
+
     -- Start listening on configured channel
     MODEM.open(R_CHANNEL)
 
@@ -90,17 +92,18 @@ end
 -- Ingest action
 function ingest(content)
 
-    print("DEBUG: INGEST STARTED!")
-
-    command = utils.splitString(content, DELIMITER)[0]
-    data = utils.splitString(content, DELIMITER)[1]
-
-    print(command)
-    print(data)
+    command = utils.splitString(content, DELIMITER)[1]
+    data = utils.splitString(content, DELIMITER)[2]
 
     if command == "PING" then
-        return "PING_RECIEVED"
+
+        response = "PING_RECEIVED"
+
+        print("R: PING S:" .. response)
+        MODEM.transmit(S_CHANNEL, R_CHANNEL, response)
+        return response
     else
+        print("R: " .. command .. " ?")
         return "UNKNOWN_COMMAND"
     end
 
