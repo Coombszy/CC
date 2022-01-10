@@ -23,7 +23,7 @@ shell.run("mkdir " .. POGOS_HOME)
 shell.run("mkdir ".. POGOS_HOME .."/lib")
 shell.run("mkdir ".. POGOS_HOME .."/config")
 
-local targetFiles = {"lib/configManager.lua", "lib/utils.lua", "config/patcher.conf", "config/shared.conf", "patcher.lua"}
+local targetFiles = {"lib/configManager.lua", "lib/utils.lua", "config/patcher.conf", "config/shared.conf", "patcher.lua", "config/tunnel.conf"}
 
 -- For each file download
 for i = 1, table.getn(targetFiles) do
