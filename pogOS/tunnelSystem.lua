@@ -55,12 +55,6 @@ function bootup()
     R_CHANNEL = tonumber(tunnelConfigs.fetch()["RECEIVE_CHANNEL"])
     DELIMITER = tunnelConfigs.fetch()["CONTENT_DELIMITER"]
 
-    print("DEBUG")
-    print(S_CHANNEL)
-    print(R_CHANNEL)
-    print(DELIMITER)
-    read()
-
 end
 
 -- Run os as a node (digger)
@@ -96,8 +90,13 @@ end
 -- Ingest action
 function ingest(content)
 
+    print("DEBUG: INGEST STARTED!")
+
     command = utils.splitString(content, DELIMITER)[0]
     data = utils.splitString(content, DELIMITER)[1]
+
+    print(command)
+    print(data)
 
     if command == "PING" then
         return "PING_RECIEVED"
