@@ -59,7 +59,7 @@ function bootup()
     print(S_CHANNEL)
     print(R_CHANNEL)
     print(DELIMITER)
-    input()
+    read()
 
 end
 
