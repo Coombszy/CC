@@ -8,7 +8,7 @@ local tunnelConfigs = require("lib/configManager")
 ------ GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.03"
+OS_VERSION = "v0.04"
 
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
 
@@ -26,7 +26,7 @@ WAIT_DURATION = null
 
 -- Drop rubbish from inventory
 function cleanInv()
-    for i = 1, 16 do
+    for i = 2, 16 do
         if(turtle.getItemCount(i) > 0) then
             keepMe = false
             for index,keyword in pairs(TO_KEEP) do
@@ -96,7 +96,8 @@ function runHost()
     -- Get user inputs
     local distance = tonumber(read())
 
-    print("What pattern? (1/3Y)")
+    print("What pattern?")
+    print("(1/3Y/2Y/2YW)")
     term.write("> ")
 
     -- Get user inputs
@@ -110,10 +111,15 @@ function runHost()
 
     for i=1, distance do
 
-        print("Sending Command: ")
+        print("Sending Command: " .. "DIG".. DELIMITER .. pattern )
         MODEM.transmit(R_CHANNEL, S_CHANNEL, "DIG".. DELIMITER .. pattern)
 
         sleep(WAIT_DURATION)
+
+        if((DISTANCE_TRAVELLED % 32) == 0) then
+            MODEM.transmit(R_CHANNEL, S_CHANNEL, "CLEAN".. DELIMITER .. "/")
+            sleep(10)
+        end
 
         if push == "y" then
             t.moveForward(1)
@@ -136,6 +142,9 @@ function ingest(content)
         MODEM.transmit(S_CHANNEL, R_CHANNEL, response)
         return response
 
+    elseif command == "CLEAN" then
+        cleanInv()
+
     -- DIG with pattern
     elseif command == "DIG" then
 
@@ -144,6 +153,18 @@ function ingest(content)
             t.digForward()
             t.moveForward(1)
             t.digUp()
+            t.digDown()
+        elseif data == "2YW" then
+            print("R:" .. command .. "/" .. data)
+
+            if not(turtle.detect()) then
+                turtle.place()
+            t.digForward()
+
+            t.moveForward(1)
+
+            if not(turtle.detectDown()) then
+                turtle.placeDown()
             t.digDown()
         elseif data == "2Y" then
             print("R:" .. command .. "/" .. data)
