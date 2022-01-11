@@ -10,6 +10,8 @@ local tunnelConfigs = require("lib/configManager")
 -- The operating system version
 OS_VERSION = "v0.01"
 
+TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
+
 -- Tunnel volatile system configs and states
 RUNNING = true
 
@@ -189,7 +191,7 @@ function helpScreen()
     print(" ! | help")
     print(" h | start as host")
     print(" n | start as node")
-    print(" / | refuel (DISABLED)")
+    print(" / | refuel")
     print(" ^ | exit")
     print("")
 
@@ -213,6 +215,9 @@ function mainScreen()
 
     -- Node
     elseif input == "n" or input == "node" then runNode()
+
+    -- Refuel
+    elseif input == "/" or input == "refuel" then t.refuel() mainScreen()
 
     -- Exit
     elseif input == "^" or input == "exit" then print("Shutting down :(") return

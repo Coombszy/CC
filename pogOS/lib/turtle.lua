@@ -52,4 +52,16 @@ function turt.moveUp(count)
     end
 end
 ------------------------------------------------------------
+-- GENERIC
+-- Refuel 
+function refuel()
+    for i = 1, 16 do
+        turtle.select(i)
+        if turtle.refuel(0) then
+            turtle.refuel(turtle.getItemCount(i))
+        end
+    end
+    turtle.select(1)
+end
+------------------------------------------------------------
 return turt
