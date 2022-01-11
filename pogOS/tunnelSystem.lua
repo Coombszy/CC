@@ -159,12 +159,14 @@ function ingest(content)
 
             if (not(turtle.detect())) then
                 turtle.place()
+            end
             t.digForward()
 
             t.moveForward(1)
 
             if (not(turtle.detectDown())) then
                 turtle.placeDown()
+            end
             t.digDown()
         elseif data == "2Y" then
             print("R:" .. command .. "/" .. data)
