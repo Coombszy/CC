@@ -109,12 +109,12 @@ function runHost()
     for i=1, distance do
 
         print("Sending Command: ")
-        MODEM.transmit(R_CHANNEL, S_CHANNEL, "DIG:" .. pattern)
+        MODEM.transmit(R_CHANNEL, S_CHANNEL, "DIG".. DELIMITER .. pattern)
 
         sleep(WAIT_DURATION)
 
         if push == "y" then
-            turt.moveForward(1)
+            t.moveForward(1)
         end
     end
 
@@ -139,14 +139,14 @@ function ingest(content)
 
         if data == "3Y" then
             print("R:" .. command .. "/" .. data)
-            turt.digForward()
-            turt.moveForward(1)
-            turt.digUp()
-            turt.digDown()
+            t.digForward()
+            t.moveForward(1)
+            t.digUp()
+            t.digDown()
         else
             print("R:" .. command .. "/" .. data)
-            turt.digForward()
-            turt.moveForward(1)
+            t.digForward()
+            t.moveForward(1)
         end
 
     -- STOP the loop
