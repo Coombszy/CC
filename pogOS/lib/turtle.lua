@@ -33,21 +33,21 @@ end
 -- MOVEMENT
 -- move Forward x amount
 function turt.moveForward(count)
-    for i=0, count do
+    for i = 1, count do
         turtle.forward()
     end
 end
 
 -- move Back x amount
 function turt.moveBack(count)
-    for i=0, count do
+    for i = 1, count do
         turtle.back()
     end
 end
 
 -- move Up x amount
 function turt.moveUp(count)
-    for i=0, count do
+    for i = 1, count do
         turtle.up()
     end
 end
