@@ -100,12 +100,22 @@ function runHost()
     -- Get user inputs
     local pattern = read()
 
+    print("Enable player push? (Y/N)")
+    term.write("> ")
+
+    -- Get user inputs
+    local push = string.lower(read())
+
     for i=1, distance do
 
         print("Sending Command: ")
         MODEM.transmit(R_CHANNEL, S_CHANNEL, "DIG:" .. pattern)
 
         sleep(WAIT_DURATION)
+
+        if push == "y" then
+            turt.moveForward(1)
+        end
     end
 
 end
