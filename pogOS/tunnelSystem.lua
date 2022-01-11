@@ -116,7 +116,7 @@ function runHost()
 
         sleep(WAIT_DURATION)
 
-        if((DISTANCE_TRAVELLED % 32) == 0) then
+        if (DISTANCE_TRAVELLED % 32) == 0 then
             MODEM.transmit(R_CHANNEL, S_CHANNEL, "CLEAN".. DELIMITER .. "/")
             sleep(10)
         end
@@ -157,13 +157,13 @@ function ingest(content)
         elseif data == "2YW" then
             print("R:" .. command .. "/" .. data)
 
-            if not(turtle.detect()) then
+            if (not(turtle.detect())) then
                 turtle.place()
             t.digForward()
 
             t.moveForward(1)
 
-            if not(turtle.detectDown()) then
+            if (not(turtle.detectDown())) then
                 turtle.placeDown()
             t.digDown()
         elseif data == "2Y" then
