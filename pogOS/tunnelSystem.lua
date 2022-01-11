@@ -11,13 +11,13 @@ local tunnelConfigs = require("lib/configManager")
 OS_VERSION = "v0.01"
 
 -- Tunnel volatile system configs and states
-HOST = false
 RUNNING = true
 
 MODEM = null
 S_CHANNEL = null
 R_CHANNEL = null
 DELIMITER = null
+WAIT_DURATION = null
 
 -----------------------------------------------------------------
 ------ FUNCTIONS
@@ -54,6 +54,7 @@ function bootup()
     S_CHANNEL = tonumber(tunnelConfigs.fetch()["SEND_CHANNEL"])
     R_CHANNEL = tonumber(tunnelConfigs.fetch()["RECEIVE_CHANNEL"])
     DELIMITER = tunnelConfigs.fetch()["CONTENT_DELIMITER"]
+    WAIT_DURATION = tonumber(tunnelConfigs.fetch()["WAIT_DURATION"])
 
 end
 
@@ -87,6 +88,26 @@ end
 -- Run os as a host (player pusher)
 function runHost()
 
+    print("How far to dig?")
+    term.write("> ")
+
+    -- Get user inputs
+    local distance = tonumber(read())
+
+    print("What pattern? (1/3Y)")
+    term.write("> ")
+
+    -- Get user inputs
+    local pattern = read()
+
+    for i=1, distance do
+
+        print("Sending Command: ")
+        MODEM.transmit(R_CHANNEL, S_CHANNEL, "DIG:" .. pattern)
+
+        sleep(WAIT_DURATION)
+    end
+
 end
 
 -- Ingest action
@@ -102,6 +123,27 @@ function ingest(content)
         print("R:PING S:" .. response)
         MODEM.transmit(S_CHANNEL, R_CHANNEL, response)
         return response
+
+    -- DIG with pattern
+    elseif command == "DIG" then
+
+        if data == "3Y" then
+            print("R:" .. command .. "/" .. data)
+            turt.digForward()
+            turt.moveForward(1)
+            turt.digUp()
+            turt.digDown()
+        else
+            print("R:" .. command .. "/" .. data)
+            turt.digForward()
+            turt.moveForward(1)
+        end
+
+    -- STOP the loop
+    elseif command == "STOP" then
+        RUNNING = false
+
+    -- CATCH all others
     else
         print("R:" .. command .. " ?")
         return "UNKNOWN_COMMAND"
