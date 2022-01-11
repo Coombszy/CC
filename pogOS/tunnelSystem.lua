@@ -8,7 +8,7 @@ local tunnelConfigs = require("lib/configManager")
 ------ GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.04"
+OS_VERSION = "v0.05"
 
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
 
@@ -116,7 +116,7 @@ function runHost()
 
         sleep(WAIT_DURATION)
 
-        if (DISTANCE_TRAVELLED % 32) == 0 then
+        if (distance % 32) == 0 then
             MODEM.transmit(R_CHANNEL, S_CHANNEL, "CLEAN".. DELIMITER .. "/")
             sleep(10)
         end
