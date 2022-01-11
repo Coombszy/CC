@@ -8,7 +8,7 @@ local tunnelConfigs = require("lib/configManager")
 ------ GLOBAL VARS
 
 -- The operating system version
-OS_VERSION = "v0.01"
+OS_VERSION = "v0.02"
 
 TO_KEEP = { "ancient", "ore", "diamond", "gem", "dust", "lapis", "crystal", "redstone", "shard", "eode", "rune", "coal", "emerald", "gold", "raw", "iron" }
 
@@ -144,6 +144,11 @@ function ingest(content)
             t.digForward()
             t.moveForward(1)
             t.digUp()
+            t.digDown()
+        elseif data == "2Y" then
+            print("R:" .. command .. "/" .. data)
+            t.digForward()
+            t.moveForward(1)
             t.digDown()
         else
             print("R:" .. command .. "/" .. data)
