@@ -1,7 +1,7 @@
 -- IMPORTS
 ----------------------------------------------------------------
 local utils = require("lib/utils")
-local storageConfigs = require("libs/configManager")
+local storageConfigs = require("lib/configManager")
 
 -- CONFIGS
 ----------------------------------------------------------------
