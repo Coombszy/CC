@@ -36,4 +36,6 @@ elseif BOOT_ITEM == 2 then
     shell.run(PATH .. "diggingSystem.lua")
 elseif BOOT_ITEM == 3 then
     shell.run(PATH .. "tunnelSystem.lua")
+elseif BOOT_ITEM == 4 then
+    shell.run(PATH .. "miningSystem.lua")
 end
