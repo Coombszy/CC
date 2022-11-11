@@ -40,4 +40,6 @@ elseif BOOT_ITEM == 4 then
     shell.run(PATH .. "miningSystem.lua")
 elseif BOOT_ITEM == 5 then
     shell.run(PATH .. "farmingSystem.lua")
+elseif BOOT_ITEM == 6 then
+    shell.run(PATH .. "storageSystemInput.lua")
 end

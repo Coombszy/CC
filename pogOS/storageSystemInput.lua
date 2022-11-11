@@ -1,3 +1,7 @@
+-- This is a very dirty clone of the storageSystem.lua, its is
+-- bad and has lots of dead code, but works for now...
+----------------------------------------------------------------
+
 -- IMPORTS
 ----------------------------------------------------------------
 local utils = require("lib/utils")
@@ -12,13 +16,16 @@ local storageConfigs = require("lib/configManager")
 PERIPHERAL_ID = 1
 
 -- Where to output items from the storage system
-OUTPUT_CHEST_NAME = "minecraft:chest_0" -- This will be overwritten via fn bootup()
+OUTPUT_CHEST_NAME = "minecraft:hopper_0" -- This will be overwritten via fn bootup()
 
 -- Chest to ignore and not push/pull data
-IGNORE_CHEST_NAMES = {}
+IGNORE_CHEST_NAMES = {"minecraft:chest_0"}
 
 -- Config delimiter
 CONFIG_DELIMETER = "|"
+
+-- Sleep
+INPUT_SLEEP = 5
 
 ----------------------------------------------------------------
 -- GLOBAL VARS
@@ -32,10 +39,7 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.59"
-
--- Easter egg messages
-EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater", "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!", "You must construct additional pylons!", "Insufficient vespene gas", "Oof", "Is this a good use of your time?", "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR", "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration", "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?", "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different", "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks", "Apes strong together", "AMC TO THE MOON!"} 
+OS_VERSION = "v1.0"
 
 -- Temporary States
 STATES = {}
@@ -430,10 +434,11 @@ end
 function bootup()
     -- Load configs
     PATH = "/"..fs.getDir( shell.getRunningProgram() ).."/"
-    storageConfigs.setTargetConfig(PATH .. "config/storage.conf")
+    storageConfigs.setTargetConfig(PATH .. "config/storageinput.conf")
 
     OUTPUT_CHEST_NAME = storageConfigs.fetch()["IO_CHEST"]
     IGNORE_CHEST_NAMES = utils.splitString(storageConfigs.fetch()["IGNORE_CHEST_NAMES"], CONFIG_DELIMETER)
+    INPUT_SLEEP = storageConfigs.fetch()["INPUT_SLEEP"]
 end
 
 ----------------------------------------------------------------
@@ -473,7 +478,7 @@ end
 function startUpScreen() 
     term.clear()
     term.setCursorPos(1,1)
-    print("-------------------------- POG OS (Storage) " .. OS_VERSION)
+    print("-------------------- POG OS (Storage Input) " .. OS_VERSION)
     print("")
     print("")
     print("     ((((((((((         ((((((((((")
@@ -490,150 +495,16 @@ function startUpScreen()
     print("#####((((((((((((((((((((((((")
     print("#############################")
     print("")
-    print("type ! or help for command help.")
-end
-
--- Write the help screen
-function helpScreen()
-    print("")
-    print("All commands have a single character alias to speed up system usage.")
-    print("")
-    print(" ! | help")
-    print("   | Brings up this help menu.")
-    print(" ? | search 'TEXT'")
-    print("   | Searches for an item, returns quantity.")
-    print(" / | get 'TEXT' 'QUANTITY'")
-    print("   | Moves QUANTITY of item to IO chest.")
-    print(" < | store")
-    print("   | Moves contents of IO chest into storage.")
-    print(" ^ | exit")
-    print("   | Close POG OS. Return to base computer OS.")
-    print("")
-
-    mainScreen()
-end
-
--- Search screen
-function searchScreen(text)
-
-    -- Update network data for search
-    updateNetworkData(MODEM)
-
-    -- Search for items
-    local foundAny, itemdata = searchItemsNoExactMatch(ALL_ITEMS_DATA, text)
-
-    -- If item was found, write it out
-    if foundAny then
-        print("")
-        print("Found " .. #itemdata .. " item(s):")
-
-        for index, itemmeta in pairs(itemdata) do 
-            
-            print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
-        end
-
-    -- No items found in the data store 
-    else
-        print ("No items found with a name containing '".. text .."'.")
-    end
-
-    mainScreen()
-end
-
--- Get items screen
-function getScreen(item, count) 
-
-    -- Update network data
-    updateNetworkData(MODEM)
-
-    -- Search for item
-    local foundAny, itemdata = searchItems(ALL_ITEMS_DATA, item)
-
-    -- If item was found, write it out
-    if not(foundAny) then
-        print ("No items found with a name containing '".. item .."'.")
-        mainScreen()
-    end
-
-    -- If more than one item with the same name was found
-    if #itemdata > 1 then
-        print("Multiple items containing '" .. item .. "' were found!")
-        print("Found " .. #itemdata .. " item(s):")
-
-        for index, itemmeta in pairs(itemdata) do 
-            print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
-        end
-
-        print("")
-        print("Please be more specific")
-        mainScreen()
-    end
-
-    -- If count is null, grab a stack of the item
-    if count == nil then
-
-        if not(STATES["MISSING_AMOUNT_WARNED"]) then
-            print("You did not specify how many to withdraw. E.g:")
-            print("> get cobble 64")
-            print("Will withdraw a stack instead! Or the next avaliable amount!")
-            print("This error will appear after next reboot.")
-            print("")
-            STATES["MISSING_AMOUNT_WARNED"] = true
-        end
-
-        -- Get the item metadata from system
-        local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
-
-        -- Get the current amount
-        local storedAmount = tonumber(itemdata[1][2])
-
-        -- Get sample data to find the max stack size of item
-        local samplechest = utils.splitString(metadata[2][1], "|")[1]
-        local sampleslot = utils.splitString(metadata[2][1], "|")[2]
-        
-        -- Get max stack size for item
-        local maxStackSize = getItemDetails(samplechest,sampleslot).maxCount
-
-        -- Get the amount to actually move into chest
-        if maxStackSize >= storedAmount then
-            count = storedAmount
-        else
-            count = maxStackSize
-        end
-
-    end
-
-    -- Get found items meta data
-    local itemmeta = itemdata[1]
-
-    -- If more than one item with the same name was found
-    if tonumber(itemmeta[2]) < tonumber(count) then
-
-        print("You are trying to withdraw more items than the system contains.")
-        print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
-        mainScreen()
-    end
-
-    -- Withdraw items!
-    moveitem(itemmeta[1], tonumber(count), OUTPUT_CHEST_NAME)
-    print("Withdrawn successfully!")
-
-    mainScreen()
-    
 end
 
 -- store screen
 function storeScreen()
 
-    -- write warning to user
-    print("Storing all items in IO chest...")
-
     -- Store items from IO test
     local stored, failed = storeItems()
 
-    print("")
-    print("Stored:")
-
+    if #failed == 0 then
+        print("Stored:")
     -- List item storing results
     for itemname, itemcount in pairs(stored) do 
         print(" - '" .. itemname .."' x " .. tostring(itemcount))
@@ -672,36 +543,13 @@ end
 -- Handle normal user input
 function mainScreen()
 
-    -- Write terminal characters
-    term.write("> ")
+    while true do
+        storeScreen()
+        print("Sleeping...")
+        os.sleep(INPUT_SLEEP)
+        term.clear()
+    end
 
-    -- Get user inputs
-    local input = string.lower(read())
-    local searchBool, searchClipped = isSearch(input)
-    local getBool, getClipped, getCount = isGet(input)
-
-    -- Help
-    if input == "!" or input == "help" then helpScreen()
-
-    -- Search
-    elseif searchBool == true then searchScreen(searchClipped)
-
-    -- Get
-    elseif getBool == true then getScreen(getClipped, getCount)
-
-    -- Store
-    elseif input == "<" or input == "store" then storeScreen()
-
-    -- Exit
-    elseif input == "^" or input == "exit" then print("Shutting down :(") return
-
-    -- HIDDEN FEATURES!
-
-    -- Feeling froggy
-    elseif input == "pog" or input == "poggy" then easterEggScreen()
-
-    -- Else, Try help?
-    else print("Unknown command, try 'help' or '!'") mainScreen() end
 end
 
 ----------------------------------------------------------------
