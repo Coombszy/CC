@@ -335,7 +335,7 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
     for id, chestname in pairs(names) do
 
         -- If not the output chest
-        if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and modem.getTypeRemote(chestname) ~= "computer" then
+        if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and MODEM.getTypeRemote(chestname) ~= "computer" then
 
             -- Get Chest Inventory and size
             local chestInventory = MODEM.callRemote(chestname, "list")

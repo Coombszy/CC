@@ -32,7 +32,7 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.59"
+OS_VERSION = "v1.60"
 
 -- Easter egg messages
 EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater", "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!", "You must construct additional pylons!", "Insufficient vespene gas", "Oof", "Is this a good use of your time?", "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR", "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration", "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?", "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different", "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks", "Apes strong together", "AMC TO THE MOON!"} 
@@ -331,7 +331,7 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
     for id, chestname in pairs(names) do
 
         -- If not the output chest
-        if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and modem.getTypeRemote(chestname) ~= "computer" then
+        if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and MODEM.getTypeRemote(chestname) ~= "computer" then
 
             -- Get Chest Inventory and size
             local chestInventory = MODEM.callRemote(chestname, "list")
