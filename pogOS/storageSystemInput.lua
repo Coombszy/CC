@@ -438,7 +438,7 @@ function bootup()
 
     OUTPUT_CHEST_NAME = storageConfigs.fetch()["IO_CHEST"]
     IGNORE_CHEST_NAMES = utils.splitString(storageConfigs.fetch()["IGNORE_CHEST_NAMES"], CONFIG_DELIMETER)
-    INPUT_SLEEP = storageConfigs.fetch()["INPUT_SLEEP"]
+    INPUT_SLEEP = tonumber(storageConfigs.fetch()["INPUT_SLEEP"])
 end
 
 ----------------------------------------------------------------
@@ -546,7 +546,6 @@ function mainScreen()
 
     while true do
         storeScreen()
-        print("Sleeping...")
         os.sleep(INPUT_SLEEP)
         term.clear()
     end
