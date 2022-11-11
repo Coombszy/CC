@@ -25,7 +25,7 @@ IGNORE_CHEST_NAMES = {"minecraft:chest_0"}
 CONFIG_DELIMETER = "|"
 
 -- Sleep
-INPUT_SLEEP = 5
+INPUT_SLEEP = 10
 
 ----------------------------------------------------------------
 -- GLOBAL VARS
@@ -39,7 +39,7 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.0"
+OS_VERSION = "v1.1"
 
 -- Temporary States
 STATES = {}
@@ -503,7 +503,7 @@ function storeScreen()
     -- Store items from IO test
     local stored, failed = storeItems()
 
-    if #failed == 0 then
+    if #failed == 0 and #stored > 0 then
         print("Stored:")
     end
     -- List item storing results
@@ -524,7 +524,7 @@ function storeScreen()
     end
 
     print("")
-    mainScreen()
+    --mainScreen()
 end
 
 -- easter egg screen
