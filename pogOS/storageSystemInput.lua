@@ -547,7 +547,6 @@ function mainScreen()
     while true do
         storeScreen()
         os.sleep(INPUT_SLEEP)
-        term.clear()
     end
 
 end
