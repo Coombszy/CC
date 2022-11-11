@@ -505,6 +505,7 @@ function storeScreen()
 
     if #failed == 0 then
         print("Stored:")
+    end
     -- List item storing results
     for itemname, itemcount in pairs(stored) do 
         print(" - '" .. itemname .."' x " .. tostring(itemcount))
