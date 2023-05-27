@@ -3,12 +3,11 @@
 SOURCE = "projecte:condenser_mk1_0"
 TARGET = "rftoolsutility:crafter3_0"
 MIN_AMOUNT = 1
-ITEM = "minecraft:cobblestone"
-SLEEP = 5
+ITEM = "alltheores:copper_ore_hammer"
+SLEEP = 1
 
 -- FUNC --
 ----------
-
 
 -- Returns amount of item in peripheral
 function remaining(p_name)
@@ -33,8 +32,6 @@ end
 s = peripheral.wrap(SOURCE)
 t = peripheral.wrap(TARGET)
 
-print(remaining(SOURCE))
-
 while true do
     local t_count = remaining(TARGET)
     local s_count = remaining(SOURCE)
@@ -49,8 +46,19 @@ while true do
             to_move = s_count
         end
 
-        -- Move items
-        s.pushItems(TARGET, 1, to_move)
+        -- Move from available slots
+        local remaining = to_move
+        for slot, item_data in pairs(s.list()) do
+            if item_data["name"] == ITEM then
+                if item_data["count"] >= remaining then
+                    s.pushItems(TARGET, slot, remaining)
+                    remaining = 0
+                else
+                    s.pushItems(TARGET, slot, item_data["count"])
+                    remaining = remaining - item_data["count"]
+                end
+            end
+        end
     end
     sleep(SLEEP)
 end
