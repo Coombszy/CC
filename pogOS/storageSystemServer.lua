@@ -43,23 +43,47 @@ function handleMessage(event, side, freq, replyFreq, msg, dist)
             modem.transmit(replyFreq, freq, { "NOT FOUND", {} })
         end
     elseif type == "RETRIEVE" then
-        print(">RETRIEVE (" .. replyFreq .. "): " .. data[1] .. "x" .. data[2])
+        print(">RETRIEVE (" .. replyFreq .. "): " .. data[1] .. "x" .. tostring(data[2]))
         local item_name = data[1]
         local item_count = tonumber(data[2])
         storage:updateData()
-        local found, matches = storage:searchItem(item_name, true)
+        local found, matches = storage:searchItem(item_name, false)
+        -- If more than one match, see if exact match exists
+        -- If so, use that, otherwise return error
+        local exact_found = false
+        if found and #matches > 1 then
+            local _, data = storage:searchItem(item_name, true)
+            if #data == 1 then exact_found = true end
+            if exact_found then
+                matches = data
+            else
+                modem.transmit(replyFreq, freq, { "BE SPECIFIC", 0 })
+                return
+            end
+        end
+        -- Since it was found get the real name
         if found then
+            local item_id = matches[1][1]
+            -- If count is nil, take a full stack
+            if item_count == nil then
+                item_count = storage:getMaxStackSize(item_id)
+            end
             local avaliable = 0
             for _, item in ipairs(matches) do
                 avaliable = avaliable + item[2]
             end
             if avaliable < item_count then
                 modem.transmit(replyFreq, freq, { "NOT ENOUGH", avaliable })
-                storage:retrieveItem(item_name, avaliable)
+                storage:retrieveItem(item_id, avaliable)
                 return
             else
-                modem.transmit(replyFreq, freq, { "FOUND", item_count })
-                storage:retrieveItem(item_name, item_count)
+                -- If exact match was found, that means there was multiple matches but it found an exact match
+                if exact_found then
+                    modem.transmit(replyFreq, freq, { "NOT FOUND", item_count })
+                else
+                    modem.transmit(replyFreq, freq, { "FOUND", item_count })
+                end
+                storage:retrieveItem(item_id, item_count)
             end
         else
             modem.transmit(replyFreq, freq, { "NOT FOUND", 0 })

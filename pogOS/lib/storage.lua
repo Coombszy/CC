@@ -340,5 +340,28 @@ function Storage:storeAll()
     return stored_items, not_stored_items
 end
 
+-- Get max stack of an item from storage system
+-- @param {string} item - Item to get max stack of
+-- @return {number} - Max stack of item
+function Storage:getMaxStackSize(item_name)
+    -- Get item data from storage system
+    local found, _, item_meta = self:findItem(item_name)
+
+    -- If item exists in storage system
+    if found then
+        -- Get first device and slot
+        local device = peripheral.wrap(Utils.splitString(item_meta[2][1], "|")[1])
+        local slot = Utils.splitString(item_meta[2][1], "|")[2]
+
+        -- Get item data from device
+        local item_data = device.getItemDetail(tonumber(slot))
+
+        -- Return max stack of item
+        return item_data["maxCount"]
+    else
+        return -1
+    end
+end
+
 ------------------------------------------------------------
 return Storage
