@@ -35,7 +35,16 @@ MODEM = nil
 OS_VERSION = "v1.60"
 
 -- Easter egg messages
-EA_STRINGS = {"Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!", "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool", "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater", "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!", "You must construct additional pylons!", "Insufficient vespene gas", "Oof", "Is this a good use of your time?", "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR", "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration", "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?", "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different", "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks", "Apes strong together", "AMC TO THE MOON!"} 
+EA_STRINGS = { "Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!",
+    "Twitch < Youtube... Kappa", "We're no strangers to love....", "I heard that Coombszy guy is pretty cool",
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ", "E", "We are number one!", "Daf's a cheater",
+    "Build the fucking aquarium", "Successfully De-0pped", "Do something better with your life", "Oppa gangnam style!",
+    "You must construct additional pylons!", "Insufficient vespene gas", "Oof", "Is this a good use of your time?",
+    "Ready? Player one", "Computer! Computer! Computer!", "Buttons!", "Look Book!", "oooOOOOohh COMPUTOR",
+    "'I mined it'", "OOOooooo baby I love your way!", "Can't touch this!", "I find GladOS quite the inspiration",
+    "I can't do that Dave", "I'M LEGALLY BLIIND", "Chompy is king", "Why is the rum always gone?",
+    "May the force be with you", "OOoh Behave!", "I like it when you push my buttons", "I'm different",
+    "Don't make lemonade", "Bonk!", "Kalm", "PANIK!", "Stonks", "Apes strong together", "AMC TO THE MOON!" }
 
 -- Temporary States
 STATES = {}
@@ -66,7 +75,7 @@ function printMethodTable(table)
 end
 
 -- Prints the contents of a chest
-function printChestContents(data) 
+function printChestContents(data)
     for slot, item in pairs(data) do
         print(("%dx%s in slot %d"):format(item.count, item.name, slot))
     end
@@ -92,7 +101,6 @@ function findItem(data, val)
             -- Return true and the item index, and the item metadata
             return true, index, metadata
         end
-
     end
     -- Return false and nil
     return false, nil, nil
@@ -100,7 +108,6 @@ end
 
 -- Search item name in ALL_ITEMS_DATA, Returns bool and {itemname, itemcount}
 function searchItems(data, val)
-
     local found = {}
     local foundOne = false
 
@@ -113,22 +120,19 @@ function searchItems(data, val)
 
         -- If itemname matches searched value
         if string.find(itemname, val) then
-
             -- Return true and the item index, and the item metadata
-            table.insert(found, {itemname, itemcount})
+            table.insert(found, { itemname, itemcount })
             foundOne = true
 
             -- If name exact matches, return the one
             if itemname == val then
-
                 -- Reset to get the exact item matched item
                 found = {}
-                table.insert(found, {itemname, itemcount})
+                table.insert(found, { itemname, itemcount })
                 foundOne = true
                 break
             end
         end
-
     end
     -- Return false and nil
     return foundOne, found
@@ -136,7 +140,6 @@ end
 
 -- Search item name in ALL_ITEMS_DATA, Returns bool and {itemname, itemcount}
 function searchItemsNoExactMatch(data, val)
-
     local found = {}
     local foundOne = false
 
@@ -149,13 +152,10 @@ function searchItemsNoExactMatch(data, val)
 
         -- If itemname matches searched value
         if string.find(itemname, val) then
-
             -- Return true and the item index, and the item metadata
-            table.insert(found, {itemname, itemcount})
+            table.insert(found, { itemname, itemcount })
             foundOne = true
-
         end
-
     end
     -- Return false and nil
     return foundOne, found
@@ -163,7 +163,6 @@ end
 
 -- Using a modem, update the ALL_ITEM_DATA with the connected chests
 function updateNetworkData(modem)
-
     -- Sample ALL_ITEMS_DATA
     -- ALL_ITEMS_DATA = { {"TEST_ITEM1", {64, {"CHEST0|25", "CHEST1|21"} } }, {"minecraft:planks", {0, {"CHEST0|1", "CHEST1|5"} } } }
 
@@ -173,31 +172,28 @@ function updateNetworkData(modem)
     -- For each Chest
     local names = modem.getNamesRemote()
     for id, chestname in pairs(names) do
-
         -- If not the output chest
         if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and modem.getTypeRemote(chestname) ~= "computer" then
-
             -- Get Chest Inventory
             local chestInventory = modem.callRemote(chestname, "list")
 
             -- For each item in chest
             for slot, item in pairs(chestInventory) do
-
                 -- Does ALL_ITEMS_DATA contain item?
-                local found, index, metadata = findItem(ALL_ITEMS_DATA, utils.splitString(item.name,":")[2])
-                
+                local found, index, metadata = findItem(ALL_ITEMS_DATA, utils.splitString(item.name, ":")[2])
+
                 -- If the all item data already contains an item
                 if (found) then
                     -- Add found item count to existing entry
                     metadata[1] = metadata[1] + item.count
                     -- Add chest/peripheral to existing metadata
-                    metadata[2][#metadata[2]+1] = chestname .. "|".. slot
-                -- Otherwise, add a new item entry
+                    metadata[2][#metadata[2] + 1] = chestname .. "|" .. slot
+                    -- Otherwise, add a new item entry
                 else
                     -- create new entry and append to end of table
-                    local newitem = {utils.splitString(item.name,":")[2], {item.count, {chestname .. "|".. slot} }}
+                    local newitem = { utils.splitString(item.name, ":")[2], { item.count, { chestname .. "|" .. slot } } }
                     -- #ALL_ITEMS_DATA = Size of table
-                    ALL_ITEMS_DATA[#ALL_ITEMS_DATA+1] = newitem
+                    ALL_ITEMS_DATA[#ALL_ITEMS_DATA + 1] = newitem
                 end
             end
         end
@@ -207,7 +203,6 @@ end
 -- Using ALL_ITEMS_DATA, move item(s) from storage cluster to target inventory
 -- ALL_ITEMS_DATA should be updated after item movement
 function moveitem(itemname, count, destinationInv)
-
     -- Amount left to move
     local remaining = count
 
@@ -217,11 +212,10 @@ function moveitem(itemname, count, destinationInv)
     -- Get item and data
     local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
 
-    -- Loop incase requested quantity is 
-    while(not requestcomplete) do
-
+    -- Loop incase requested quantity is
+    while (not requestcomplete) do
         -- for each metadata entry
-        for index, invdata in pairs(metadata[2]) do 
+        for index, invdata in pairs(metadata[2]) do
             -- Split string by delimiter
             local dataSplit = utils.splitString(invdata, "|")
 
@@ -235,25 +229,23 @@ function moveitem(itemname, count, destinationInv)
 
             -- Calculate movement
             -- If enough in inventory, take remaining
-            if(remaining <= targetitemdata["count"]) then
+            if (remaining <= targetitemdata["count"]) then
                 inventory.pushItems(destinationInv, tonumber(invslot), remaining)
                 remaining = 0
                 requestcomplete = true
                 break
-            -- Otherwise, Take as much as possible and move on
+                -- Otherwise, Take as much as possible and move on
             else
                 inventory.pushItems(destinationInv, tonumber(invslot), targetitemdata["count"])
                 remaining = remaining - targetitemdata["count"]
             end
-
         end
-    end    
+    end
 end
 
 -- Using ALL_ITEMS_DATA, store item(s) to storage cluster
 -- ALL_ITEMS_DATA should be updated after item movement
 function storeItems()
-
     -- Items that were not able to be stored
     local failedItems = {}
     -- Items that were successfully stored
@@ -267,39 +259,33 @@ function storeItems()
 
     -- For each item in chest
     for slot, item in pairs(chestInventory) do
-
         -- Set default conditions
         local complete = false
         local remaining = item.count
 
         -- Does ALL_ITEMS_DATA contain item?
-        local itemname = utils.splitString(item.name,":")[2]
+        local itemname = utils.splitString(item.name, ":")[2]
         local found, index, metadata = findItem(ALL_ITEMS_DATA, itemname)
 
         -- If item was found try store
         if found then
-
             -- if completed moving item
             complete, remaining = addToExisting(slot, itemname, metadata, remaining)
-            
         end
 
         -- If still not found after adding to empty slot
-        if not(complete) then
-
+        if not (complete) then
             -- Add to next empty space
             complete, remaining = addAtEmpty(slot, itemname, metadata, remaining, remaining)
-
         end
 
         -- Item was not able to be stored
-        if not(complete) then
-
-            -- Add itme to failed items list 
+        if not (complete) then
+            -- Add itme to failed items list
             failedItems[itemname] = remaining
 
-        -- Report item storage success
-        else 
+            -- Report item storage success
+        else
             -- Set 0 to allow adding
             if successfulItems[itemname] == nil then
                 successfulItems[itemname] = 0
@@ -310,7 +296,6 @@ function storeItems()
 
         -- Update network data again for next item in loop
         updateNetworkData(MODEM)
-
     end
 
     return successfulItems, failedItems
@@ -318,7 +303,6 @@ end
 
 -- Add to empty space
 function addAtEmpty(inputslot, itemname, metadata, itemamount)
-
     -- Set states
     local complete = false
     local remaining = itemamount
@@ -329,17 +313,15 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
     -- For each chest
     local names = MODEM.getNamesRemote()
     for id, chestname in pairs(names) do
-
         -- If not the output chest
         if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and MODEM.getTypeRemote(chestname) ~= "computer" then
-
             -- Get Chest Inventory and size
             local chestInventory = MODEM.callRemote(chestname, "list")
             local chestSize = MODEM.callRemote(chestname, "size")
 
             -- Stores each slot that is already got an item in
             local takenSlots = {}
-            
+
             -- For each item in chest
             for slot, item in pairs(chestInventory) do
                 table.insert(takenSlots, slot)
@@ -347,10 +329,8 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
 
             -- For each chest slot
             for i = 1, chestSize do
-
                 -- If slot is empty
-                if not(utils.hasValue(takenSlots, i)) then
-
+                if not (utils.hasValue(takenSlots, i)) then
                     -- While no failures
                     local failed = false
 
@@ -376,7 +356,6 @@ end
 
 -- Add to existing space
 function addToExisting(inputslot, itemname, metadata, itemamount)
-
     -- Set states
     local complete = false
     local remaining = itemamount
@@ -386,10 +365,9 @@ function addToExisting(inputslot, itemname, metadata, itemamount)
 
     -- For each chest in metadata of item
     for i = 1, #metadata[2] do
-
         -- Get target data from metadata
-        local targetchest = utils.splitString(metadata[2][i],"|")[1]
-        local targetchestslot = utils.splitString(metadata[2][i],"|")[2]
+        local targetchest = utils.splitString(metadata[2][i], "|")[1]
+        local targetchestslot = utils.splitString(metadata[2][i], "|")[2]
 
         -- Get chest and item data
         local targetchestobject = peripheral.wrap(targetchest)
@@ -404,7 +382,6 @@ function addToExisting(inputslot, itemname, metadata, itemamount)
         local moveableamount = 0
         if maxmoveableamount >= remaining then
             moveableamount = remaining
-
         else
             moveableamount = maxmoveableamount
         end
@@ -413,24 +390,23 @@ function addToExisting(inputslot, itemname, metadata, itemamount)
         outputchest.pushItems(targetchest, inputslot, moveableamount, tonumber(targetchestslot))
 
         -- Update remaining
-        remaining = remaining - moveableamount 
+        remaining = remaining - moveableamount
 
         -- If all items have been moved
         if remaining <= 0 then
             complete = true
             break
         end
-        
     end
 
     return complete, remaining
 end
 
--- Gets defaults 
+-- Gets defaults
 function bootup()
     -- Load configs
-    PATH = "/"..fs.getDir( shell.getRunningProgram() ).."/"
-    storageConfigs.setTargetConfig(PATH .. "config/storage.conf")
+    PATH = "/" .. fs.getDir(shell.getRunningProgram()) .. "/"
+    storageConfigs.setTargetConfig(PATH .. "config/storageLegacy.conf")
 
     OUTPUT_CHEST_NAME = storageConfigs.fetch()["IO_CHEST"]
     IGNORE_CHEST_NAMES = utils.splitString(storageConfigs.fetch()["IGNORE_CHEST_NAMES"], CONFIG_DELIMETER)
@@ -441,10 +417,8 @@ end
 
 -- Is the parameters of the command correct for a search conditions
 function isSearch(text)
-
     if string.sub(text, 0, 2) == '? ' then
         return true, string.sub(text, 3, string.len(text))
-
     elseif text:sub(0, 7) == "search " then
         return true, string.sub(text, 8, string.len(text))
     end
@@ -454,25 +428,24 @@ end
 
 -- Is the parameters of the command correct for a get conditions
 function isGet(text)
-
     if string.sub(text, 0, 2) == '/ ' then
-        return true, utils.splitString(string.sub(text, 3, string.len(text)), " ")[1], utils.splitString(string.sub(text, 3, string.len(text)), " ")[2]
-
+        return true, utils.splitString(string.sub(text, 3, string.len(text)), " ")[1],
+            utils.splitString(string.sub(text, 3, string.len(text)), " ")[2]
     elseif text:sub(0, 4) == "get " then
-        return true, utils.splitString(string.sub(text, 5, string.len(text)), " ")[1], utils.splitString(string.sub(text, 5, string.len(text)), " ")[2]
+        return true, utils.splitString(string.sub(text, 5, string.len(text)), " ")[1],
+            utils.splitString(string.sub(text, 5, string.len(text)), " ")[2]
     end
 
     return false, nil, nil
 end
 
-
 ----------------------------------------------------------------
 -- SCREENS
 
 -- Writes boot screen, version and logo
-function startUpScreen() 
+function startUpScreen()
     term.clear()
-    term.setCursorPos(1,1)
+    term.setCursorPos(1, 1)
     print("-------------------------- POG OS (Storage) " .. OS_VERSION)
     print("")
     print("")
@@ -515,7 +488,6 @@ end
 
 -- Search screen
 function searchScreen(text)
-
     -- Update network data for search
     updateNetworkData(MODEM)
 
@@ -527,22 +499,20 @@ function searchScreen(text)
         print("")
         print("Found " .. #itemdata .. " item(s):")
 
-        for index, itemmeta in pairs(itemdata) do 
-            
-            print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
+        for index, itemmeta in pairs(itemdata) do
+            print(" - '" .. itemmeta[1] .. "' x " .. tostring(itemmeta[2]))
         end
 
-    -- No items found in the data store 
+        -- No items found in the data store
     else
-        print ("No items found with a name containing '".. text .."'.")
+        print("No items found with a name containing '" .. text .. "'.")
     end
 
     mainScreen()
 end
 
 -- Get items screen
-function getScreen(item, count) 
-
+function getScreen(item, count)
     -- Update network data
     updateNetworkData(MODEM)
 
@@ -550,8 +520,8 @@ function getScreen(item, count)
     local foundAny, itemdata = searchItems(ALL_ITEMS_DATA, item)
 
     -- If item was found, write it out
-    if not(foundAny) then
-        print ("No items found with a name containing '".. item .."'.")
+    if not (foundAny) then
+        print("No items found with a name containing '" .. item .. "'.")
         mainScreen()
     end
 
@@ -560,8 +530,8 @@ function getScreen(item, count)
         print("Multiple items containing '" .. item .. "' were found!")
         print("Found " .. #itemdata .. " item(s):")
 
-        for index, itemmeta in pairs(itemdata) do 
-            print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
+        for index, itemmeta in pairs(itemdata) do
+            print(" - '" .. itemmeta[1] .. "' x " .. tostring(itemmeta[2]))
         end
 
         print("")
@@ -571,8 +541,7 @@ function getScreen(item, count)
 
     -- If count is null, grab a stack of the item
     if count == nil then
-
-        if not(STATES["MISSING_AMOUNT_WARNED"]) then
+        if not (STATES["MISSING_AMOUNT_WARNED"]) then
             print("You did not specify how many to withdraw. E.g:")
             print("> get cobble 64")
             print("Will withdraw a stack instead! Or the next avaliable amount!")
@@ -590,9 +559,9 @@ function getScreen(item, count)
         -- Get sample data to find the max stack size of item
         local samplechest = utils.splitString(metadata[2][1], "|")[1]
         local sampleslot = utils.splitString(metadata[2][1], "|")[2]
-        
+
         -- Get max stack size for item
-        local maxStackSize = getItemDetails(samplechest,sampleslot).maxCount
+        local maxStackSize = getItemDetails(samplechest, sampleslot).maxCount
 
         -- Get the amount to actually move into chest
         if maxStackSize >= storedAmount then
@@ -600,7 +569,6 @@ function getScreen(item, count)
         else
             count = maxStackSize
         end
-
     end
 
     -- Get found items meta data
@@ -608,9 +576,8 @@ function getScreen(item, count)
 
     -- If more than one item with the same name was found
     if tonumber(itemmeta[2]) < tonumber(count) then
-
         print("You are trying to withdraw more items than the system contains.")
-        print(" - '" .. itemmeta[1] .."' x " .. tostring(itemmeta[2]))
+        print(" - '" .. itemmeta[1] .. "' x " .. tostring(itemmeta[2]))
         mainScreen()
     end
 
@@ -619,12 +586,10 @@ function getScreen(item, count)
     print("Withdrawn successfully!")
 
     mainScreen()
-    
 end
 
 -- store screen
 function storeScreen()
-
     -- write warning to user
     print("Storing all items in IO chest...")
 
@@ -635,19 +600,19 @@ function storeScreen()
     print("Stored:")
 
     -- List item storing results
-    for itemname, itemcount in pairs(stored) do 
-        print(" - '" .. itemname .."' x " .. tostring(itemcount))
+    for itemname, itemcount in pairs(stored) do
+        print(" - '" .. itemname .. "' x " .. tostring(itemcount))
     end
 
     -- Only list failed if greater than 0
-    if #failed > 0 then 
+    if #failed > 0 then
         print()
         print("")
         print("Failed to store:")
 
         -- List failed item storing results
-        for itemname, itemcount in pairs(failed) do 
-            print(" - '" .. itemname .."' x " .. tostring(itemcount))
+        for itemname, itemcount in pairs(failed) do
+            print(" - '" .. itemname .. "' x " .. tostring(itemcount))
         end
     end
 
@@ -657,7 +622,6 @@ end
 
 -- easter egg screen
 function easterEggScreen()
-
     -- Get random number generator and shuffle a few
     -- math.randomseed(os.time())
     math.random(); math.random(); math.random()
@@ -671,7 +635,6 @@ end
 
 -- Handle normal user input
 function mainScreen()
-
     -- Write terminal characters
     term.write("> ")
 
@@ -681,27 +644,37 @@ function mainScreen()
     local getBool, getClipped, getCount = isGet(input)
 
     -- Help
-    if input == "!" or input == "help" then helpScreen()
+    if input == "!" or input == "help" then
+        helpScreen()
 
-    -- Search
-    elseif searchBool == true then searchScreen(searchClipped)
+        -- Search
+    elseif searchBool == true then
+        searchScreen(searchClipped)
 
-    -- Get
-    elseif getBool == true then getScreen(getClipped, getCount)
+        -- Get
+    elseif getBool == true then
+        getScreen(getClipped, getCount)
 
-    -- Store
-    elseif input == "<" or input == "store" then storeScreen()
+        -- Store
+    elseif input == "<" or input == "store" then
+        storeScreen()
 
-    -- Exit
-    elseif input == "^" or input == "exit" then print("Shutting down :(") return
+        -- Exit
+    elseif input == "^" or input == "exit" then
+        print("Shutting down :(")
+        return
 
-    -- HIDDEN FEATURES!
+        -- HIDDEN FEATURES!
 
-    -- Feeling froggy
-    elseif input == "pog" or input == "poggy" then easterEggScreen()
+        -- Feeling froggy
+    elseif input == "pog" or input == "poggy" then
+        easterEggScreen()
 
-    -- Else, Try help?
-    else print("Unknown command, try 'help' or '!'") mainScreen() end
+        -- Else, Try help?
+    else
+        print("Unknown command, try 'help' or '!'")
+        mainScreen()
+    end
 end
 
 ----------------------------------------------------------------
