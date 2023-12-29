@@ -1,5 +1,10 @@
 -- Interface to storage devices
--- Version 0.0
+--
+-- Version 1.1
+-- Fixed bug in removing ignored devices from ignore list.
+--
+-- Version 1.0
+-- Initial Release
 ------------------------------------------------------------
 local Storage = {}
 setmetatable(Storage, Storage)
@@ -54,8 +59,8 @@ function Storage:getStorageDevices()
     end
 
     -- Remove ignored devices
-    for i, device in ipairs(self.ignore_list) do
-        if Utils.hasValue(storage_devices_filtered, device) then
+    for i, device in ipairs(storage_devices_filtered) do
+        if Utils.hasValue(self.ignore_list, device) then
             table.remove(storage_devices_filtered, i)
         end
     end
