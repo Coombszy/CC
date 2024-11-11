@@ -32,7 +32,7 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.60"
+OS_VERSION = "v1.62"
 
 -- Easter egg messages
 EA_STRINGS = { "Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!",
@@ -177,6 +177,11 @@ function updateNetworkData(modem)
             -- Get Chest Inventory
             local chestInventory = modem.callRemote(chestname, "list")
 
+            -- If nil (empty inventory), skip searching through it
+            if chestInventory == nil then
+               goto updateNetworkData_loop_continue
+            end
+
             -- For each item in chest
             for slot, item in pairs(chestInventory) do
                 -- Does ALL_ITEMS_DATA contain item?
@@ -196,6 +201,8 @@ function updateNetworkData(modem)
                     ALL_ITEMS_DATA[#ALL_ITEMS_DATA + 1] = newitem
                 end
             end
+
+            ::updateNetworkData_loop_continue:: 
         end
     end
 end
@@ -317,6 +324,7 @@ function addAtEmpty(inputslot, itemname, metadata, itemamount)
         if OUTPUT_CHEST_NAME ~= chestname and not utils.hasValue(IGNORE_CHEST_NAMES, chestname) and MODEM.getTypeRemote(chestname) ~= "computer" then
             -- Get Chest Inventory and size
             local chestInventory = MODEM.callRemote(chestname, "list")
+            if chestInventory == nil then chestInventory = {} end -- If chest is empty
             local chestSize = MODEM.callRemote(chestname, "size")
 
             -- Stores each slot that is already got an item in
