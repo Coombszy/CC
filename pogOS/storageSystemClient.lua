@@ -30,7 +30,6 @@ STATES["MISSING_AMOUNT_WARNED"] = false
 
 -- Functions
 ----------------------------------------------------------------
--- modem.transmit(config["SERVER_PORT"], config["CLIENT_PORT"], { "STORE", {} })
 
 -- Query the server for an item
 -- @param {string} itemname - The name of the item to query

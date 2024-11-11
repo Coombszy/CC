@@ -1,5 +1,8 @@
 -- Interface to storage devices
 --
+-- Version 1.2
+-- Fixed bug due to empty devices returning a nil, instead of an empty table.
+--
 -- Version 1.1
 -- Fixed bug in removing ignored devices from ignore list.
 --
@@ -109,6 +112,7 @@ function Storage:updateData()
     for _, device in ipairs(storage_devices) do
         -- Get items in device
         local device_inventory = self.modem.callRemote(device, "list")
+        if device_inventory == nil then device_inventory = {} end
 
         -- For each item in chest
         for slot, item in pairs(device_inventory) do
@@ -267,6 +271,7 @@ function Storage:addAtEmpty(item_slot, amount)
     for _, device in pairs(storage_devices) do
         -- Get device inventory and size
         local device_inventory = self.modem.callRemote(device, "list")
+        if device_inventory == nil then device_inventory = {} end
         local device_size = self.modem.callRemote(device, "size")
 
         -- Stores each slot that already has an item in it
