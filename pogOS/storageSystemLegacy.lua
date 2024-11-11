@@ -32,7 +32,7 @@ ALL_ITEMS_DATA = {}
 MODEM = nil
 
 -- The operating system version
-OS_VERSION = "v1.62"
+OS_VERSION = "v1.63"
 
 -- Easter egg messages
 EA_STRINGS = { "Feeling Poggy Froggy", "No you", "Better that Applied Energistics", "Loser", "PogChamp!",
@@ -381,6 +381,7 @@ function addToExisting(inputslot, itemname, metadata, itemamount)
         local targetchestobject = peripheral.wrap(targetchest)
         local itemdetails = targetchestobject.getItemDetail(tonumber(targetchestslot))
         local itemmaxstack = itemdetails.maxCount
+        if itemmaxstack == nil then itemmaxstack = 1 end
         local itemcount = itemdetails.count
 
         -- Calculate amount to move
